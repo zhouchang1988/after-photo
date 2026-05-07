@@ -1,6 +1,11 @@
 package pkg
 
-import "io"
+import (
+	"fmt"
+	"io"
+	"os"
+	"strings"
+)
 
 // 全局输出变量，用于同时输出到屏幕和日志文件
 var out io.Writer
@@ -8,6 +13,43 @@ var out io.Writer
 // SetOutput 设置全局输出
 func SetOutput(w io.Writer) {
 	out = w
+}
+
+// ConfirmFunc 确认函数类型
+type ConfirmFuncType func(message string) bool
+
+// confirmFunc 确认函数，TUI模式下通过 channel 替换
+var confirmFunc = defaultConfirm
+
+// ConfirmCh TUI模式下发送确认请求的 channel
+var ConfirmCh chan *ConfirmRequest
+
+// ConfirmRequest 确认请求
+type ConfirmRequest struct {
+	Message string
+	Result  chan bool
+}
+
+// SetConfirmFunc 设置确认函数
+func SetConfirmFunc(f ConfirmFuncType) {
+	confirmFunc = f
+}
+
+// RequestConfirm 请求用户确认
+func RequestConfirm(message string) bool {
+	if ConfirmCh != nil {
+		result := make(chan bool, 1)
+		ConfirmCh <- &ConfirmRequest{Message: message, Result: result}
+		return <-result
+	}
+	return confirmFunc(message)
+}
+
+func defaultConfirm(message string) bool {
+	fmt.Fprintf(out, "%s", message)
+	var confirm string
+	fmt.Fscanln(os.Stdin, &confirm)
+	return strings.ToLower(strings.TrimSpace(confirm)) == "y"
 }
 
 // ANSI颜色代码

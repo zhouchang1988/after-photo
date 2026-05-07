@@ -26,9 +26,9 @@ echo "开始编译跨平台版本..."
 # 编译 macOS 版本
 echo ""
 echo "编译 macOS 版本..."
-GOOS=darwin GOARCH=amd64 go build -o bin/after_photo_mac
+GOOS=darwin GOARCH=amd64 go build -o bin/after-photo-mac
 if [ $? -eq 0 ]; then
-    echo "✓ macOS 版本编译成功: bin/after_photo_mac"
+    echo "✓ macOS 版本编译成功: bin/after-photo-mac"
 else
     echo "✗ macOS 版本编译失败"
     exit 1
@@ -37,9 +37,9 @@ fi
 # 编译 Windows 版本
 echo ""
 echo "编译 Windows 版本..."
-GOOS=windows GOARCH=amd64 go build -o bin/after_photo.exe
+GOOS=windows GOARCH=amd64 go build -o bin/after-photo.exe
 if [ $? -eq 0 ]; then
-    echo "✓ Windows 版本编译成功: bin/after_photo.exe"
+    echo "✓ Windows 版本编译成功: bin/after-photo.exe"
 else
     echo "✗ Windows 版本编译失败"
     exit 1
@@ -67,7 +67,7 @@ if [ "$RUN_TEST" = true ]; then
     echo "使用编译的程序处理 input 目录..."
     # 输入：test/input（指定目录），空行（执行1-3），3（退出）
     # 将输出重定向到 /dev/null 以保持输出清洁
-    (echo "test/input"; echo ""; echo "3") | ./bin/after_photo_mac > /dev/null
+    (echo "test/input"; echo ""; echo "3") | ./bin/after-photo-mac > /dev/null
 
     # 比较文件结构
     echo ""

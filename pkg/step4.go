@@ -92,11 +92,7 @@ func step4(photoDir string) {
 	}
 
 	// 用户确认
-	fmt.Fprintf(out, "\n确认删除这些文件吗？(输入 'y' 确认，其他任何输入取消): ")
-	var confirm string
-	fmt.Scanln(&confirm)
-
-	if strings.ToLower(strings.TrimSpace(confirm)) != "y" {
+	if !RequestConfirm("\n确认删除这些文件吗？(输入 'y' 确认，其他任何输入取消): ") {
 		fmt.Fprintf(out, "操作已取消\n")
 		return
 	}
