@@ -15,7 +15,6 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	figure "github.com/common-nighthawk/go-figure"
 )
 
 // ── Styles ───────────────────────────────────────────────────────
@@ -58,21 +57,17 @@ var (
 
 // ── Gradient Banner ──────────────────────────────────────────────────
 
-// gradientStop defines a color at a position (0.0-1.0) along the gradient.
 type gradientStop struct {
-	pos    float64
+	pos     float64
 	r, g, b uint8
 }
 
-// bannerGradient matches the Tokyo Night palette used throughout the app:
-//   steel blue → lavender → sakura pink
 var bannerGradient = []gradientStop{
 	{0.0, 0x7D, 0xC4, 0xE4}, // #7DC4E4 blue
 	{0.5, 0xBB, 0x9A, 0xF7}, // #BB9AF7 purple
 	{1.0, 0xF7, 0x76, 0x8E}, // #F7768E pink
 }
 
-// sampleGradient returns the RGB color at position t (0.0-1.0) along the gradient.
 func sampleGradient(t float64) (uint8, uint8, uint8) {
 	stops := bannerGradient
 	if t <= stops[0].pos {
@@ -94,39 +89,47 @@ func sampleGradient(t float64) (uint8, uint8, uint8) {
 }
 
 func lerp8(a, b uint8, t float64) uint8 {
-	return uint8(float64(a) + t*float64(b-a))
+	return uint8(float64(a) + t*(float64(b)-float64(a)))
 }
 
-// renderBanner renders text using a figlet font with a vertical gradient.
-func renderBanner(text string) string {
-	myFigure := figure.NewFigure(text, "slant", true)
-	lines := strings.Split(myFigure.String(), "\n")
+var bannerLines = []string{
+	` █████╗ ███████╗████████╗███████╗██████╗ `,
+	`██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗`,
+	`███████║█████╗     ██║   █████╗  ██████╔╝`,
+	`██╔══██║██╔══╝     ██║   ██╔══╝  ██╔══██╗`,
+	`██║  ██║██║        ██║   ███████╗██║  ██║`,
+	`╚═╝  ╚═╝╚═╝        ╚═╝   ╚══════╝╚═╝  ╚═╝`,
+	`██████╗ ██╗  ██╗ ██████╗ ████████╗ ██████╗ `,
+	`██╔══██╗██║  ██║██╔═══██╗╚══██╔══╝██╔═══██╗`,
+	`██████╔╝███████║██║   ██║   ██║   ██║   ██║`,
+	`██╔═══╝ ██╔══██║██║   ██║   ██║   ██║   ██║`,
+	`██║     ██║  ██║╚██████╔╝   ██║   ╚██████╔╝`,
+	`╚═╝     ╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝ `,
+}
 
-	// Count non-empty lines for gradient mapping
-	nonEmpty := 0
-	for _, l := range lines {
-		if strings.TrimSpace(l) != "" {
-			nonEmpty++
+func renderBanner() string {
+	maxLen := 0
+	for _, l := range bannerLines {
+		if rl := len([]rune(l)); rl > maxLen {
+			maxLen = rl
 		}
-	}
-	if nonEmpty == 0 {
-		return ""
 	}
 
 	var b strings.Builder
-	idx := 0
-	for _, line := range lines {
-		if strings.TrimSpace(line) == "" {
-			continue
-		}
-		t := float64(idx) / float64(nonEmpty-1)
-		r, g, bl := sampleGradient(t)
-		color := fmt.Sprintf("#%02X%02X%02X", r, g, bl)
-		style := lipgloss.NewStyle().Foreground(lipgloss.Color(color)).Bold(true)
+	for row, line := range bannerLines {
 		b.WriteString("  ")
-		b.WriteString(style.Render(line))
+		runes := []rune(line)
+		for col, ch := range runes {
+			t := float64(col+row*3) / float64(maxLen+len(bannerLines)*3)
+			if t > 1 {
+				t = 1
+			}
+			r, g, bl := sampleGradient(t)
+			color := fmt.Sprintf("#%02X%02X%02X", r, g, bl)
+			style := lipgloss.NewStyle().Foreground(lipgloss.Color(color)).Bold(true)
+			b.WriteString(style.Render(string(ch)))
+		}
 		b.WriteString("\n")
-		idx++
 	}
 	return b.String()
 }
@@ -567,8 +570,7 @@ func (m model) View() string {
 func (m model) viewInputDir() string {
 	var b strings.Builder
 
-	b.WriteString(renderBanner("AFTER"))
-	b.WriteString(renderBanner("PHOTO"))
+	b.WriteString(renderBanner())
 	b.WriteString("\n")
 	b.WriteString(helpStyle.Render("  v1.0 · 照片整理工具"))
 	b.WriteString("\n\n")
