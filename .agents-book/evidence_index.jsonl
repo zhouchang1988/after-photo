@@ -1,0 +1,41 @@
+{"type":"class","path":"main.go","symbol":"model","methods":["Init","Update","View","updateInputDir","updateSelectSteps","updateConfirm","updateDone","buildExecutionCmd"],"line":220,"reason":"TUI 模型主类，状态机核心"}
+{"type":"method","path":"main.go","symbol":"model::Update","line":260,"reason":"TUI 状态机更新入口"}
+{"type":"method","path":"main.go","symbol":"model::buildExecutionCmd","line":473,"reason":"构建执行命令，注入输出和确认机制"}
+{"type":"method","path":"main.go","symbol":"executeSteps","line":503,"reason":"执行选定步骤的入口"}
+{"type":"method","path":"main.go","symbol":"channelWriter::Write","line":170,"reason":"TUI 输出捕获"}
+{"type":"method","path":"main.go","symbol":"logWriter::Write","line":200,"reason":"日志文件写入，自动去除 ANSI 码"}
+{"type":"method","path":"main.go","symbol":"removeANSICodes","line":731,"reason":"ANSI 颜色码清理工具函数"}
+{"type":"function","path":"pkg/config.go","symbol":"SetOutput","line":14,"reason":"全局输出设置入口"}
+{"type":"function","path":"pkg/config.go","symbol":"RequestConfirm","line":39,"reason":"用户确认请求入口，支持 TUI channel"}
+{"type":"class","path":"pkg/config.go","symbol":"ConfirmRequest","methods":[],"line":28,"reason":"TUI 确认请求数据结构"}
+{"type":"variable","path":"pkg/config.go","symbol":"rawExtensions","line":88,"reason":"RAW 文件扩展名映射（20 种格式）"}
+{"type":"variable","path":"pkg/config.go","symbol":"videoExtensions","line":112,"reason":"视频文件扩展名映射（6 种格式）"}
+{"type":"variable","path":"pkg/config.go","symbol":"SimilarityThreshold","line":122,"reason":"pHash 相似度阈值常量"}
+{"type":"function","path":"pkg/step1.go","symbol":"step1","line":11,"reason":"按文件类型拆分目录核心逻辑"}
+{"type":"function","path":"pkg/step1.go","symbol":"Step1","line":68,"reason":"步骤 1 公开入口"}
+{"type":"function","path":"pkg/step2.go","symbol":"step2","line":16,"reason":"重复照片归类核心逻辑"}
+{"type":"function","path":"pkg/step2.go","symbol":"Step2","line":73,"reason":"步骤 2 公开入口"}
+{"type":"function","path":"pkg/step2.go","symbol":"processDirectory","line":35,"reason":"处理单个目录，检测重复照片"}
+{"type":"function","path":"pkg/step2.go","symbol":"processRawByJpgStructure","line":180,"reason":"按 JPG 结构同步移动 RAW 文件"}
+{"type":"function","path":"pkg/step2.go","symbol":"calculateImageHash","line":293,"reason":"pHash 感知哈希计算"}
+{"type":"function","path":"pkg/step2.go","symbol":"performDCT","line":352,"reason":"2D DCT 离散余弦变换"}
+{"type":"function","path":"pkg/step2.go","symbol":"performDCT1D","line":378,"reason":"1D DCT 变换"}
+{"type":"function","path":"pkg/step2.go","symbol":"calculateMedian","line":399,"reason":"中位数计算"}
+{"type":"function","path":"pkg/step2.go","symbol":"hammingDistance","line":419,"reason":"汉明距离计算，用于相似度判定"}
+{"type":"function","path":"pkg/step2.go","symbol":"moveGroup","line":159,"reason":"移动相似照片到分组目录"}
+{"type":"function","path":"pkg/step3.go","symbol":"step3","line":14,"reason":"最佳照片选择核心逻辑"}
+{"type":"function","path":"pkg/step3.go","symbol":"Step3","line":78,"reason":"步骤 3 公开入口"}
+{"type":"function","path":"pkg/step3.go","symbol":"selectBestInGroups","line":43,"reason":"在分组中选择最佳照片"}
+{"type":"function","path":"pkg/step3.go","symbol":"keepRawByJpgSelection","line":146,"reason":"同步 RAW 文件标记"}
+{"type":"function","path":"pkg/step3.go","symbol":"calculateImageQualityScore","line":231,"reason":"图片质量评分算法（清晰度+亮度）"}
+{"type":"function","path":"pkg/step3.go","symbol":"isDirEmpty","line":331,"reason":"检查目录是否为空"}
+{"type":"function","path":"pkg/step3.go","symbol":"removeEmptyDir","line":370,"reason":"删除空目录"}
+{"type":"function","path":"pkg/step4.go","symbol":"step4","line":11,"reason":"多余 RAW 文件清理核心逻辑"}
+{"type":"function","path":"pkg/step4.go","symbol":"Step4","line":83,"reason":"步骤 4 公开入口"}
+{"type":"capability_candidate","capability":"照片类型拆分","kind":"implemented","entrypoint":"pkg/step1.go::Step1","evidence_paths":["pkg/step1.go","pkg/config.go"],"confidence":"high"}
+{"type":"capability_candidate","capability":"重复照片检测与分组","kind":"implemented","entrypoint":"pkg/step2.go::Step2","evidence_paths":["pkg/step2.go","pkg/config.go"],"confidence":"high"}
+{"type":"capability_candidate","capability":"最佳照片选择","kind":"implemented","entrypoint":"pkg/step3.go::Step3","evidence_paths":["pkg/step3.go"],"confidence":"high"}
+{"type":"capability_candidate","capability":"多余 RAW 文件清理","kind":"implemented","entrypoint":"pkg/step4.go::Step4","evidence_paths":["pkg/step4.go","pkg/config.go"],"confidence":"high"}
+{"type":"capability_candidate","capability":"TUI 交互界面","kind":"exposed","entrypoint":"main.go::main","evidence_paths":["main.go"],"confidence":"high"}
+{"type":"capability_candidate","capability":"日志记录","kind":"implemented","entrypoint":"main.go::logWriter","evidence_paths":["main.go"],"confidence":"high"}
+{"type":"capability_candidate","capability":"用户确认机制","kind":"implemented","entrypoint":"pkg/config.go::RequestConfirm","evidence_paths":["pkg/config.go","main.go"],"confidence":"high"}
