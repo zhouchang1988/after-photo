@@ -18,15 +18,15 @@ func step2(photoDir string) {
 	rawDir := filepath.Join(photoDir, "raw")
 
 	if _, err := os.Stat(jpgDir); os.IsNotExist(err) {
-		fmt.Fprintf(out, "错误: jpg目录不存在，请先执行步骤1\n")
+		fmt.Fprintf(getOut(), "错误: jpg目录不存在，请先执行步骤1\n")
 		return
 	}
 
-	fmt.Fprintf(out, "\n处理JPG目录...\n")
+	fmt.Fprintf(getOut(), "\n处理JPG目录...\n")
 	processDirectory(jpgDir, "JPG")
 
 	if _, err := os.Stat(rawDir); err == nil {
-		fmt.Fprintf(out, "\n处理RAW目录...\n")
+		fmt.Fprintf(getOut(), "\n处理RAW目录...\n")
 		processRawByJpgStructure(jpgDir, rawDir)
 	}
 }
@@ -78,12 +78,12 @@ func processDirectory(dirPath string, fileType string) {
 	})
 
 	if err != nil {
-		fmt.Fprintf(out, "扫描%s文件失败: %v\n", fileType, err)
+		fmt.Fprintf(getOut(), "扫描%s文件失败: %v\n", fileType, err)
 		return
 	}
 
 	if len(files) == 0 {
-		fmt.Fprintf(out, "未找到%s文件\n", fileType)
+		fmt.Fprintf(getOut(), "未找到%s文件\n", fileType)
 		return
 	}
 
@@ -91,7 +91,8 @@ func processDirectory(dirPath string, fileType string) {
 		return files[i].birthTime < files[j].birthTime
 	})
 
-	fmt.Fprintf(out, "找到 %d 张%s图片\n", len(files), fileType)
+	fmt.Fprintf(getOut(), "找到 %d 张%s图片\n", len(files), fileType)
+	reportProgress(0, len(files), "计算图片哈希...")
 
 	const timeThreshold = 30
 
@@ -100,7 +101,9 @@ func processDirectory(dirPath string, fileType string) {
 	var currentHash string
 	var lastBirthTime int64
 
-	for _, file := range files {
+	for i, file := range files {
+		reportProgress(i+1, len(files), fmt.Sprintf("计算哈希: %s", filepath.Base(file.path)))
+		
 		if len(currentGroup) == 0 {
 			hash, err := calculateImageHash(file.path)
 			if err == nil {
@@ -153,7 +156,7 @@ func processDirectory(dirPath string, fileType string) {
 		groupsCreated++
 	}
 
-	fmt.Fprintf(out, "%s目录处理完成！共创建 %d 个分组\n", fileType, groupsCreated)
+	fmt.Fprintf(getOut(), "%s目录处理完成！共创建 %d 个分组\n", fileType, groupsCreated)
 }
 
 func moveGroup(dirPath string, files []string) {
@@ -161,17 +164,17 @@ func moveGroup(dirPath string, files []string) {
 	groupDir := filepath.Join(dirPath, groupName)
 
 	if err := os.MkdirAll(groupDir, 0755); err != nil {
-		fmt.Fprintf(out, "创建分组目录失败: %v\n", err)
+		fmt.Fprintf(getOut(), "创建分组目录失败: %v\n", err)
 		return
 	}
 
-	fmt.Fprintf(out, "创建分组: %s (%d 张图片)\n", groupName, len(files))
+	fmt.Fprintf(getOut(), "创建分组: %s (%d 张图片)\n", groupName, len(files))
 	for _, filePath := range files {
 		destPath := filepath.Join(groupDir, filepath.Base(filePath))
 		if err := os.Rename(filePath, destPath); err != nil {
-			fmt.Fprintf(out, "移动文件失败 %s: %v\n", filepath.Base(filePath), err)
+			fmt.Fprintf(getOut(), "移动文件失败 %s: %v\n", filepath.Base(filePath), err)
 		} else {
-			fmt.Fprintf(out, "  移动: %s\n", filepath.Base(filePath))
+			fmt.Fprintf(getOut(), "  移动: %s\n", filepath.Base(filePath))
 		}
 	}
 }
@@ -205,16 +208,16 @@ func processRawByJpgStructure(jpgDir, rawDir string) {
 	})
 
 	if err != nil {
-		fmt.Fprintf(out, "扫描RAW目录失败: %v\n", err)
+		fmt.Fprintf(getOut(), "扫描RAW目录失败: %v\n", err)
 		return
 	}
 
 	if len(rawFiles) == 0 {
-		fmt.Fprintf(out, "未找到RAW文件\n")
+		fmt.Fprintf(getOut(), "未找到RAW文件\n")
 		return
 	}
 
-	fmt.Fprintf(out, "找到 %d 个RAW文件\n", len(rawFiles))
+	fmt.Fprintf(getOut(), "找到 %d 个RAW文件\n", len(rawFiles))
 
 	jpgGroups := make(map[string][]string)
 	err = filepath.Walk(jpgDir, func(path string, info os.FileInfo, err error) error {
@@ -258,7 +261,7 @@ func processRawByJpgStructure(jpgDir, rawDir string) {
 	})
 
 	if err != nil {
-		fmt.Fprintf(out, "扫描JPG目录结构失败: %v\n", err)
+		fmt.Fprintf(getOut(), "扫描JPG目录结构失败: %v\n", err)
 		return
 	}
 
@@ -268,7 +271,7 @@ func processRawByJpgStructure(jpgDir, rawDir string) {
 		groupDir := filepath.Join(rawDir, groupName)
 
 		if err := os.MkdirAll(groupDir, 0755); err != nil {
-			fmt.Fprintf(out, "创建RAW分组目录失败 %s: %v\n", groupName, err)
+			fmt.Fprintf(getOut(), "创建RAW分组目录失败 %s: %v\n", groupName, err)
 			continue
 		}
 
@@ -276,9 +279,9 @@ func processRawByJpgStructure(jpgDir, rawDir string) {
 			if rawPath, exists := rawFiles[jpgFilename]; exists {
 				destPath := filepath.Join(groupDir, filepath.Base(rawPath))
 				if err := os.Rename(rawPath, destPath); err != nil {
-					fmt.Fprintf(out, "移动RAW文件失败 %s: %v\n", filepath.Base(rawPath), err)
+					fmt.Fprintf(getOut(), "移动RAW文件失败 %s: %v\n", filepath.Base(rawPath), err)
 				} else {
-					fmt.Fprintf(out, "移动: %s -> %s/\n", filepath.Base(rawPath), groupName)
+					fmt.Fprintf(getOut(), "移动: %s -> %s/\n", filepath.Base(rawPath), groupName)
 					movedCount++
 					delete(rawFiles, jpgFilename)
 				}
@@ -286,7 +289,7 @@ func processRawByJpgStructure(jpgDir, rawDir string) {
 		}
 	}
 
-	fmt.Fprintf(out, "\nRAW目录处理完成！共移动 %d 个文件\n", movedCount)
+	fmt.Fprintf(getOut(), "\nRAW目录处理完成！共移动 %d 个文件\n", movedCount)
 }
 
 // 计算图片的感知哈希值
@@ -399,14 +402,7 @@ func performDCT1D(input []float64) []float64 {
 func calculateMedian(values []float64) float64 {
 	sorted := make([]float64, len(values))
 	copy(sorted, values)
-
-	for i := 0; i < len(sorted); i++ {
-		for j := i + 1; j < len(sorted); j++ {
-			if sorted[i] > sorted[j] {
-				sorted[i], sorted[j] = sorted[j], sorted[i]
-			}
-		}
-	}
+	sort.Float64s(sorted)
 
 	n := len(sorted)
 	if n%2 == 1 {

@@ -16,25 +16,25 @@ func step3(photoDir string) {
 	rawDir := filepath.Join(photoDir, "raw")
 
 	if _, err := os.Stat(jpgDir); os.IsNotExist(err) {
-		fmt.Fprintf(out, "错误: jpg目录不存在，请先执行步骤1\n")
+		fmt.Fprintf(getOut(), "错误: jpg目录不存在，请先执行步骤1\n")
 		return
 	}
 
-	fmt.Fprintf(out, "\n处理JPG目录，挑选最佳照片...\n")
+	fmt.Fprintf(getOut(), "\n处理JPG目录，挑选最佳照片...\n")
 	selectBestInGroups(jpgDir, "JPG")
 
 	// 检查并删除空的 JPG 目录
 	if removeEmptyDir(jpgDir, "JPG") {
-		fmt.Fprintf(out, "✓ JPG目录已删除（无图片文件）\n")
+		fmt.Fprintf(getOut(), "✓ JPG目录已删除（无图片文件）\n")
 	}
 
 	if _, err := os.Stat(rawDir); err == nil {
-		fmt.Fprintf(out, "\n处理RAW目录，同步标记最佳照片...\n")
+		fmt.Fprintf(getOut(), "\n处理RAW目录，同步标记最佳照片...\n")
 		keepRawByJpgSelection(jpgDir, rawDir)
 
 		// 检查并删除空的 RAW 目录
 		if removeEmptyDir(rawDir, "RAW") {
-			fmt.Fprintf(out, "✓ RAW目录已删除（无图片文件）\n")
+			fmt.Fprintf(getOut(), "✓ RAW目录已删除（无图片文件）\n")
 		}
 	}
 }
@@ -97,12 +97,12 @@ func selectBestInGroups(dirPath string, fileType string) {
 	})
 
 	if err != nil {
-		fmt.Fprintf(out, "扫描分组失败: %v\n", err)
+		fmt.Fprintf(getOut(), "扫描分组失败: %v\n", err)
 		return
 	}
 
 	if len(groups) == 0 {
-		fmt.Fprintf(out, "没有找到分组\n")
+		fmt.Fprintf(getOut(), "没有找到分组\n")
 		return
 	}
 
@@ -132,14 +132,14 @@ func selectBestInGroups(dirPath string, fileType string) {
 		newPath := filepath.Join(filepath.Dir(bestFile), newFilename)
 
 		if err := os.Rename(bestFile, newPath); err != nil {
-			fmt.Fprintf(out, "  重命名失败 %s: %v\n", bestFilename, err)
+			fmt.Fprintf(getOut(), "  重命名失败 %s: %v\n", bestFilename, err)
 		} else {
-			fmt.Fprintf(out, "  [最佳] %s -> %s (得分: %.2f)\n", bestFilename, newFilename, bestScore)
+			fmt.Fprintf(getOut(), "  [最佳] %s -> %s (得分: %.2f)\n", bestFilename, newFilename, bestScore)
 			markedCount++
 		}
 	}
 
-	fmt.Fprintf(out, "\n%s完成！共标记 %d 个最佳文件%s\n", ColorGreen, markedCount, ColorReset)
+	fmt.Fprintf(getOut(), "\n%s完成！共标记 %d 个最佳文件%s\n", ColorGreen, markedCount, ColorReset)
 }
 
 // 同步RAW文件的标记
@@ -167,16 +167,16 @@ func keepRawByJpgSelection(jpgDir, rawDir string) {
 	})
 
 	if err != nil {
-		fmt.Fprintf(out, "扫描RAW目录失败: %v\n", err)
+		fmt.Fprintf(getOut(), "扫描RAW目录失败: %v\n", err)
 		return
 	}
 
 	if len(rawFiles) == 0 {
-		fmt.Fprintf(out, "未找到RAW文件\n")
+		fmt.Fprintf(getOut(), "未找到RAW文件\n")
 		return
 	}
 
-	fmt.Fprintf(out, "找到 %d 个RAW文件\n", len(rawFiles))
+	fmt.Fprintf(getOut(), "找到 %d 个RAW文件\n", len(rawFiles))
 
 	updatedCount := 0
 
@@ -205,14 +205,14 @@ func keepRawByJpgSelection(jpgDir, rawDir string) {
 				newRawPath := filepath.Join(filepath.Dir(rawPath), newRawFilename)
 
 				if err := os.Rename(rawPath, newRawPath); err != nil {
-					fmt.Fprintf(out, "  重命名RAW失败 %s: %v\n", filepath.Base(rawPath), err)
+					fmt.Fprintf(getOut(), "  重命名RAW失败 %s: %v\n", filepath.Base(rawPath), err)
 				} else {
-					fmt.Fprintf(out, "  [同步] %s -> %s\n", filepath.Base(rawPath), newRawFilename)
+					fmt.Fprintf(getOut(), "  [同步] %s -> %s\n", filepath.Base(rawPath), newRawFilename)
 					updatedCount++
 				}
 				delete(rawFiles, originalBaseName)
 			} else {
-				fmt.Fprintf(out, "  [警告] 未找到对应的RAW文件: %s\n", originalBaseName)
+				fmt.Fprintf(getOut(), "  [警告] 未找到对应的RAW文件: %s\n", originalBaseName)
 			}
 		}
 
@@ -220,11 +220,11 @@ func keepRawByJpgSelection(jpgDir, rawDir string) {
 	})
 
 	if err != nil {
-		fmt.Fprintf(out, "同步RAW标记失败: %v\n", err)
+		fmt.Fprintf(getOut(), "同步RAW标记失败: %v\n", err)
 		return
 	}
 
-	fmt.Fprintf(out, "\nRAW目录同步完成！共更新 %d 个文件\n", updatedCount)
+	fmt.Fprintf(getOut(), "\nRAW目录同步完成！共更新 %d 个文件\n", updatedCount)
 }
 
 // 计算图片质量得分
@@ -320,12 +320,7 @@ func calculateImageQualityScore(imagePath string) float64 {
 	return score
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+
 
 // 检查目录是否为空（没有图片文件）
 func isDirEmpty(dirPath string, dirType string) bool {
@@ -374,7 +369,7 @@ func removeEmptyDir(dirPath, dirType string) bool {
 
 	if isDirEmpty(dirPath, dirType) {
 		if err := os.RemoveAll(dirPath); err != nil {
-			fmt.Fprintf(out, "  警告：删除目录失败 %s: %v\n", dirPath, err)
+			fmt.Fprintf(getOut(), "  警告：删除目录失败 %s: %v\n", dirPath, err)
 			return false
 		}
 		return true

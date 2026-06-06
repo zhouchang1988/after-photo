@@ -20,14 +20,14 @@ func step1(photoDir string) {
 
 	for _, dir := range dirsToCreate {
 		if err := os.MkdirAll(dir, 0755); err != nil {
-			fmt.Fprintf(out, "创建目录失败 %s: %v\n", dir, err)
+			fmt.Fprintf(getOut(), "创建目录失败 %s: %v\n", dir, err)
 			return
 		}
 	}
 
 	entries, err := os.ReadDir(photoDir)
 	if err != nil {
-		fmt.Fprintf(out, "读取目录失败: %v\n", err)
+		fmt.Fprintf(getOut(), "读取目录失败: %v\n", err)
 		return
 	}
 
@@ -54,9 +54,9 @@ func step1(photoDir string) {
 
 		destPath := filepath.Join(targetDir, entry.Name())
 		if err := os.Rename(filePath, destPath); err != nil {
-			fmt.Fprintf(out, "移动文件失败 %s: %v\n", entry.Name(), err)
+			fmt.Fprintf(getOut(), "移动文件失败 %s: %v\n", entry.Name(), err)
 		} else {
-			fmt.Fprintf(out, "  移动: %s -> %s/\n", entry.Name(), filepath.Base(targetDir))
+			fmt.Fprintf(getOut(), "  移动: %s -> %s/\n", entry.Name(), filepath.Base(targetDir))
 			movedCount++
 		}
 	}
@@ -66,5 +66,5 @@ func step1(photoDir string) {
 		os.Remove(videoDir)
 	}
 
-	fmt.Fprintf(out, "\n%s步骤1完成！%s 共移动 %d 个文件\n", ColorGreen, ColorReset, movedCount)
+	fmt.Fprintf(getOut(), "\n%s步骤1完成！%s 共移动 %d 个文件\n", ColorGreen, ColorReset, movedCount)
 }

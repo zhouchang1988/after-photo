@@ -14,17 +14,17 @@ func step4(photoDir string) {
 	rawDir := filepath.Join(photoDir, "raw")
 
 	if _, err := os.Stat(jpgDir); os.IsNotExist(err) {
-		fmt.Fprintf(out, "错误: 未找到 jpg 目录，请先执行步骤1\n")
+		fmt.Fprintf(getOut(), "错误: 未找到 jpg 目录，请先执行步骤1\n")
 		return
 	}
 
 	if _, err := os.Stat(rawDir); os.IsNotExist(err) {
-		fmt.Fprintf(out, "错误: 未找到 raw 目录，请先执行步骤1\n")
+		fmt.Fprintf(getOut(), "错误: 未找到 raw 目录，请先执行步骤1\n")
 		return
 	}
 
-	fmt.Fprintf(out, "\n警告: 此操作将删除在 raw 目录中但没有对应 JPG 文件的 RAW 文件\n")
-	fmt.Fprintf(out, "建议: 请确保已备份重要的 RAW 文件\n")
+	fmt.Fprintf(getOut(), "\n警告: 此操作将删除在 raw 目录中但没有对应 JPG 文件的 RAW 文件\n")
+	fmt.Fprintf(getOut(), "建议: 请确保已备份重要的 RAW 文件\n")
 
 	// 收集所有需要删除的文件
 	var filesToDelete []string
@@ -53,17 +53,17 @@ func step4(photoDir string) {
 		ext := filepath.Ext(rawPath)
 		baseName := strings.TrimSuffix(filepath.Base(rawPath), ext)
 		
-		// 尝试查找对应的 JPG 文件（可能有 .JPG 或 .jpg 扩展名）
+		// 尝试查找对应的 JPG 文件（可能有 .JPG/.jpg/.JPEG/.jpeg 扩展名）
 		parentDir := filepath.Dir(jpgPath)
-		jpgPath1 := filepath.Join(parentDir, baseName+".JPG")
-		jpgPath2 := filepath.Join(parentDir, baseName+".jpg")
-
-		// 检查 JPG 文件是否存在
+		jpgExts := []string{".JPG", ".jpg", ".JPEG", ".jpeg"}
+		
 		jpgExists := false
-		if _, err := os.Stat(jpgPath1); err == nil {
-			jpgExists = true
-		} else if _, err := os.Stat(jpgPath2); err == nil {
-			jpgExists = true
+		for _, jpgExt := range jpgExts {
+			jpgPath := filepath.Join(parentDir, baseName+jpgExt)
+			if _, err := os.Stat(jpgPath); err == nil {
+				jpgExists = true
+				break
+			}
 		}
 
 		// 如果 JPG 不存在，则标记为待删除
@@ -75,25 +75,25 @@ func step4(photoDir string) {
 	})
 
 	if err != nil {
-		fmt.Fprintf(out, "错误: 遍历 raw 目录失败: %v\n", err)
+		fmt.Fprintf(getOut(), "错误: 遍历 raw 目录失败: %v\n", err)
 		return
 	}
 
 	// 显示统计信息
 	if len(filesToDelete) == 0 {
-		fmt.Fprintf(out, "\n✓ 没有发现多余的 RAW 文件\n")
+		fmt.Fprintf(getOut(), "\n✓ 没有发现多余的 RAW 文件\n")
 		return
 	}
 
-	fmt.Fprintf(out, "\n发现 %d 个多余的 RAW 文件将被删除:\n", len(filesToDelete))
+	fmt.Fprintf(getOut(), "\n发现 %d 个多余的 RAW 文件将被删除:\n", len(filesToDelete))
 	for i, file := range filesToDelete {
 		relPath, _ := filepath.Rel(photoDir, file)
-		fmt.Fprintf(out, "  [%d] %s\n", i+1, relPath)
+		fmt.Fprintf(getOut(), "  [%d] %s\n", i+1, relPath)
 	}
 
 	// 用户确认
 	if !RequestConfirm("\n确认删除这些文件吗？(输入 'y' 确认，其他任何输入取消): ") {
-		fmt.Fprintf(out, "操作已取消\n")
+		fmt.Fprintf(getOut(), "操作已取消\n")
 		return
 	}
 
@@ -101,11 +101,11 @@ func step4(photoDir string) {
 	deletedCount := 0
 	for _, file := range filesToDelete {
 		if err := os.Remove(file); err != nil {
-			fmt.Fprintf(out, "错误: 删除文件失败 %s: %v\n", file, err)
+			fmt.Fprintf(getOut(), "错误: 删除文件失败 %s: %v\n", file, err)
 		} else {
 			deletedCount++
 		}
 	}
 
-	fmt.Fprintf(out, "\n✓ 成功删除 %d 个多余的 RAW 文件\n", deletedCount)
+	fmt.Fprintf(getOut(), "\n✓ 成功删除 %d 个多余的 RAW 文件\n", deletedCount)
 }

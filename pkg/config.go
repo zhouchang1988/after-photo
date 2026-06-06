@@ -5,21 +5,40 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 )
 
 // 全局输出变量，用于同时输出到屏幕和日志文件
-var out io.Writer
+var (
+	out    io.Writer
+	outMu  sync.RWMutex
+)
 
 // SetOutput 设置全局输出
 func SetOutput(w io.Writer) {
+	outMu.Lock()
+	defer outMu.Unlock()
 	out = w
+}
+
+// getOut 获取当前输出writer（线程安全）
+func getOut() io.Writer {
+	outMu.RLock()
+	defer outMu.RUnlock()
+	return out
 }
 
 // ConfirmFunc 确认函数类型
 type ConfirmFuncType func(message string) bool
 
+// ProgressFunc 进度回调函数类型
+type ProgressFunc func(current, total int, message string)
+
 // confirmFunc 确认函数，TUI模式下通过 channel 替换
 var confirmFunc = defaultConfirm
+
+// progressFunc 进度回调函数
+var progressFunc ProgressFunc
 
 // ConfirmCh TUI模式下发送确认请求的 channel
 var ConfirmCh chan *ConfirmRequest
@@ -35,6 +54,18 @@ func SetConfirmFunc(f ConfirmFuncType) {
 	confirmFunc = f
 }
 
+// SetProgressFunc 设置进度回调函数
+func SetProgressFunc(f ProgressFunc) {
+	progressFunc = f
+}
+
+// reportProgress 报告进度（内部使用）
+func reportProgress(current, total int, message string) {
+	if progressFunc != nil {
+		progressFunc(current, total, message)
+	}
+}
+
 // RequestConfirm 请求用户确认
 func RequestConfirm(message string) bool {
 	if ConfirmCh != nil {
@@ -46,7 +77,7 @@ func RequestConfirm(message string) bool {
 }
 
 func defaultConfirm(message string) bool {
-	fmt.Fprintf(out, "%s", message)
+	fmt.Fprintf(getOut(), "%s", message)
 	var confirm string
 	fmt.Fscanln(os.Stdin, &confirm)
 	return strings.ToLower(strings.TrimSpace(confirm)) == "y"
