@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>After Photo - 照片整理工具</title>
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1 class="logo">After Photo</h1>
+        <span class="version">v1.0</span>
+      </div>
+      <div class="header-right">
+        <button id="theme-toggle" class="btn-icon" title="切换主题">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Theme Panel -->
+    <div id="theme-panel" class="theme-panel hidden">
+      <div class="theme-panel-header">
+        <h2>选择主题</h2>
+        <div class="theme-filter">
+          <button class="filter-btn active" data-filter="all">全部</button>
+          <button class="filter-btn" data-filter="dark">深色</button>
+          <button class="filter-btn" data-filter="light">浅色</button>
+        </div>
+        <button id="theme-close" class="btn-icon">&times;</button>
+      </div>
+      <div id="theme-grid" class="theme-grid">
+        <!-- Themes will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Step 1: Directory Input -->
+      <section id="step-dir" class="section active">
+        <div class="section-header">
+          <h2>选择照片目录</h2>
+          <p class="section-desc">选择要整理的照片目录，或留空使用程序所在目录</p>
+        </div>
+        <div class="input-group">
+          <input type="text" id="dir-input" placeholder="输入照片目录路径..." class="input">
+          <button id="btn-browse" class="btn btn-secondary">浏览...</button>
+        </div>
+        <div id="dir-error" class="error hidden"></div>
+        <div class="section-actions">
+          <button id="btn-next" class="btn btn-primary">下一步</button>
+        </div>
+      </section>
+
+      <!-- Step 2: Select Steps -->
+      <section id="step-select" class="section hidden">
+        <div class="section-header">
+          <h2>选择执行步骤</h2>
+          <p class="section-desc" id="current-dir"></p>
+        </div>
+        <div class="steps-list">
+          <label class="step-item">
+            <input type="checkbox" id="step1" checked>
+            <div class="step-content">
+              <span class="step-name">按文件类型拆分目录</span>
+              <span class="step-desc">JPG→jpg/ RAW→raw/ 视频→video/</span>
+            </div>
+          </label>
+          <label class="step-item">
+            <input type="checkbox" id="step2" checked>
+            <div class="step-content">
+              <span class="step-name">检测并归类重复照片</span>
+              <span class="step-desc">基于感知哈希算法识别相似照片</span>
+            </div>
+          </label>
+          <label class="step-item">
+            <input type="checkbox" id="step3" checked>
+            <div class="step-content">
+              <span class="step-name">在重复照片中选择最佳</span>
+              <span class="step-desc">基于清晰度和亮度自动评分</span>
+            </div>
+          </label>
+          <label class="step-item danger">
+            <input type="checkbox" id="step4">
+            <div class="step-content">
+              <span class="step-name">删除多余的RAW文件</span>
+              <span class="step-desc">删除没有对应JPG的RAW文件</span>
+            </div>
+          </label>
+        </div>
+        <div class="section-actions">
+          <button id="btn-back" class="btn btn-secondary">返回</button>
+          <button id="btn-start" class="btn btn-primary">开始执行</button>
+        </div>
+      </section>
+
+      <!-- Step 3: Running -->
+      <section id="step-running" class="section hidden">
+        <div class="section-header">
+          <h2>执行中</h2>
+          <div class="status-bar">
+            <span id="status-text" class="status processing">处理中...</span>
+            <span id="timer" class="timer">00:00</span>
+          </div>
+        </div>
+        <div id="output" class="output"></div>
+        
+        <!-- Confirm Dialog -->
+        <div id="confirm-dialog" class="dialog hidden">
+          <div class="dialog-content">
+            <h3>确认操作</h3>
+            <p id="confirm-message"></p>
+            <div class="dialog-actions">
+              <button id="btn-confirm-no" class="btn btn-secondary">取消</button>
+              <button id="btn-confirm-yes" class="btn btn-danger">确认删除</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 4: Done -->
+      <section id="step-done" class="section hidden">
+        <div class="section-header">
+          <h2>执行完成</h2>
+          <div class="status-bar">
+            <span class="status success">✓ 完成</span>
+            <span id="total-time" class="timer"></span>
+          </div>
+        </div>
+        <div id="final-output" class="output"></div>
+        <div class="section-actions">
+          <button id="btn-continue" class="btn btn-secondary">继续其他步骤</button>
+          <button id="btn-new-dir" class="btn btn-secondary">整理其他文件夹</button>
+          <button id="btn-quit" class="btn btn-primary">退出程序</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./src/main.js"></script>
+</body>
+</html>
