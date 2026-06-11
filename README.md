@@ -12,6 +12,13 @@
 - **RAW 清理**：一键清理没有对应 JPG 的 RAW 文件，释放存储空间
 - **操作留痕**：自动生成带时间戳的日志文件，每一步操作可追溯
 
+## 两种界面
+
+| 界面 | 启动方式 | 特点 |
+|------|----------|------|
+| **TUI** (终端) | `go run main.go` | 轻量、无需 GUI 环境 |
+| **GUI** (桌面) | `go run ./gui` | 33 套主题、鼠标操作、实时日志 |
+
 ## 适合谁
 
 - **人像摄影师**：一次拍摄多角度多表情，连拍几十张只留最自然的一张
@@ -23,21 +30,28 @@
 
 ```
 after-photo/
-├── main.go          # 主程序入口
-├── build.sh         # 跨平台编译脚本
-├── go.mod           # Go 模块定义
-├── bin/             # 编译输出目录
-│   ├── after-photo-mac    # macOS 可执行文件
-│   └── after-photo.exe    # Windows 可执行文件
-├── test/            # 测试目录
-│   ├── input/       # 测试输入数据
-│   └── output/      # 测试预期输出
-└── pkg/             # 核心功能包
-    ├── config.go    # 颜色常量、文件扩展名映射
-    ├── step1.go     # 按文件类型拆分
-    ├── step2.go     # 重复照片检测
-    ├── step3.go     # 最佳照片选择
-    └── step4.go     # 删除多余的RAW文件
+├── main.go              # TUI 入口（Bubble Tea）
+├── build.sh             # 跨平台编译脚本
+├── go.mod               # Go 模块定义
+├── bin/                 # TUI 编译输出
+├── gui/                 # GUI 模块（Wails v2）
+│   ├── main.go          # GUI 入口
+│   ├── app.go           # 后端逻辑
+│   ├── go.mod           # GUI 模块定义
+│   ├── wails.json       # Wails 配置
+│   └── frontend/        # 前端资源
+│       ├── index.html
+│       ├── src/
+│       │   ├── main.js
+│       │   └── style.css  # 33 套主题
+│       └── wailsjs/     # 自动生成的绑定
+├── pkg/                 # 核心业务逻辑（TUI/GUI 共享）
+│   ├── config.go
+│   ├── step1.go         # 按文件类型拆分
+│   ├── step2.go         # 重复照片检测
+│   ├── step3.go         # 最佳照片选择
+│   └── step4.go         # 删除多余的RAW文件
+└── test/                # 测试目录
 ```
 
 ## 安装和使用
@@ -49,18 +63,16 @@ after-photo/
 git clone <repository-url>
 cd after-photo
 
-# 跨平台编译
+# 编译 TUI 版本
 ./build.sh
 
-# 编译并运行测试
-./build.sh --test
+# 编译 GUI 版本（需要 Wails CLI）
+./build.sh --gui
 ```
 
 ### 运行程序
 
-程序已预编译在 `bin/` 目录下，可根据系统选择对应版本直接使用。
-
-**方式 1：在当前目录运行并输入目标路径**
+**TUI 模式**
 
 ```bash
 # macOS
@@ -68,11 +80,33 @@ cd after-photo
 
 # Windows
 bin\after-photo.exe
+
+# 或直接运行
+go run main.go
 ```
 
-**方式 2：复制到目标目录运行**
+**GUI 模式**
 
-将编译好的程序复制到要整理的照片目录，在该目录下运行。
+```bash
+# 直接运行
+go run ./gui
+
+# 或运行编译后的版本
+open gui/build/bin/After\ Photo.app  # macOS
+```
+
+## GUI 主题
+
+GUI 版本支持 33 套主题，点击右上角太阳图标切换：
+
+| 深色主题 (20) | 浅色主题 (13) |
+|--------------|--------------|
+| Tokyo Night | Catppuccin Latte |
+| Dracula | GitHub Light |
+| Catppuccin Mocha | One Light |
+| Nord | Solarized Light |
+| GitHub Dark | Minimal Light |
+| ... | ... |
 
 ## 使用步骤
 
@@ -134,6 +168,12 @@ bin\after-photo.exe
 ```
 
 测试会备份 `test/input` 目录，使用编译后的程序处理测试目录，比较输出结果与预期结果，最后恢复测试目录。
+
+## 依赖
+
+- Go 1.24+
+- [Bubble Tea](https://github.com/charmbracelet/bubbletea) (TUI)
+- [Wails v2](https://wails.io/) (GUI，可选)
 
 ## 许可证
 

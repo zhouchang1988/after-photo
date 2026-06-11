@@ -13,5 +13,12 @@
 *.swp
 *.swo
 
+# Build output
+bin/
+gui/build/
+
 # Code review graph data
 .code-review-graph/
+
+# OpenCode internal
+.omo/
