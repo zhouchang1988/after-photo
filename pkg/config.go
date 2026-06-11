@@ -28,52 +28,61 @@ func getOut() io.Writer {
 	return out
 }
 
-// ConfirmFunc 确认函数类型
 type ConfirmFuncType func(message string) bool
 
-// ProgressFunc 进度回调函数类型
 type ProgressFunc func(current, total int, message string)
 
-// confirmFunc 确认函数，TUI模式下通过 channel 替换
-var confirmFunc = defaultConfirm
+var (
+	confirmFunc   = defaultConfirm
+	confirmFuncMu sync.RWMutex
+)
 
-// progressFunc 进度回调函数
-var progressFunc ProgressFunc
+var (
+	progressFunc   ProgressFunc
+	progressFuncMu sync.RWMutex
+)
 
-// ConfirmCh TUI模式下发送确认请求的 channel
 var ConfirmCh chan *ConfirmRequest
 
-// ConfirmRequest 确认请求
 type ConfirmRequest struct {
 	Message string
 	Result  chan bool
 }
 
-// SetConfirmFunc 设置确认函数
 func SetConfirmFunc(f ConfirmFuncType) {
+	confirmFuncMu.Lock()
+	defer confirmFuncMu.Unlock()
 	confirmFunc = f
 }
 
-// SetProgressFunc 设置进度回调函数
+func getConfirmFunc() ConfirmFuncType {
+	confirmFuncMu.RLock()
+	defer confirmFuncMu.RUnlock()
+	return confirmFunc
+}
+
 func SetProgressFunc(f ProgressFunc) {
+	progressFuncMu.Lock()
+	defer progressFuncMu.Unlock()
 	progressFunc = f
 }
 
-// reportProgress 报告进度（内部使用）
 func reportProgress(current, total int, message string) {
-	if progressFunc != nil {
-		progressFunc(current, total, message)
+	progressFuncMu.RLock()
+	f := progressFunc
+	progressFuncMu.RUnlock()
+	if f != nil {
+		f(current, total, message)
 	}
 }
 
-// RequestConfirm 请求用户确认
 func RequestConfirm(message string) bool {
 	if ConfirmCh != nil {
 		result := make(chan bool, 1)
 		ConfirmCh <- &ConfirmRequest{Message: message, Result: result}
 		return <-result
 	}
-	return confirmFunc(message)
+	return getConfirmFunc()(message)
 }
 
 func defaultConfirm(message string) bool {
