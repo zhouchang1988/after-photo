@@ -1,8 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// After Photo - Frontend Application
-// ═══════════════════════════════════════════════════════════════
-
-// Theme definitions
 const themes = [
   { id: 'tokyo-night', name: 'Tokyo Night', type: 'dark', bg: '#1a1b26', ink: '#a9b1d6', accent: '#7aa2f7', success: '#9ece6a', danger: '#f7768e' },
   { id: 'dracula', name: 'Dracula', type: 'dark', bg: '#282a36', ink: '#f8f8f2', accent: '#ff79c6', success: '#50fa7b', danger: '#ff5555' },
@@ -24,6 +19,7 @@ const themes = [
   { id: 'monokai', name: 'Monokai', type: 'dark', bg: '#282828', ink: '#f8f8f2', accent: '#a6e22e', success: '#a6e22e', danger: '#f92672' },
   { id: 'slack-dark', name: 'Slack Dark', type: 'dark', bg: '#1a1d21', ink: '#d1d2d3', accent: '#1264a3', success: '#2bac76', danger: '#e01e5a' },
   { id: 'dark-plus', name: 'Dark+', type: 'dark', bg: '#1e1e1e', ink: '#d4d4d4', accent: '#569cd6', success: '#6a9955', danger: '#f44747' },
+  { id: 'min-dark', name: 'Minimal Dark', type: 'dark', bg: '#1a1a1a', ink: '#e0e0e0', accent: '#4da6ff', success: '#4caf50', danger: '#f44336' },
   { id: 'catppuccin-latte', name: 'Catppuccin Latte', type: 'light', bg: '#eff1f5', ink: '#4c4f69', accent: '#8839ef', success: '#40a02b', danger: '#d20f39' },
   { id: 'github-light', name: 'GitHub Light', type: 'light', bg: '#ffffff', ink: '#1f2328', accent: '#0969da', success: '#1a7f37', danger: '#d1242f' },
   { id: 'one-light', name: 'One Light', type: 'light', bg: '#fafafa', ink: '#383a42', accent: '#4078f2', success: '#50a14f', danger: '#e45649' },
@@ -33,20 +29,14 @@ const themes = [
   { id: 'light-plus', name: 'Light+', type: 'light', bg: '#ffffff', ink: '#333333', accent: '#0066cc', success: '#22863a', danger: '#cb2431' },
   { id: 'buddy-light', name: 'Default Light', type: 'light', bg: '#ffffff', ink: '#1a1a1a', accent: '#0066cc', success: '#28a745', danger: '#dc3545' },
   { id: 'vitesse-light', name: 'Vitesse Light', type: 'light', bg: '#f7f7f7', ink: '#1a1a1a', accent: '#2993a6', success: '#4e8c2f', danger: '#cb4a5a' },
-  { id: 'min-dark', name: 'Minimal Dark', type: 'dark', bg: '#1a1a1a', ink: '#e0e0e0', accent: '#4da6ff', success: '#4caf50', danger: '#f44336' },
   { id: 'mpe-atom-light', name: 'Atom Light', type: 'light', bg: '#fafafa', ink: '#383a42', accent: '#4078f2', success: '#50a14f', danger: '#e45649' },
   { id: 'mpe-one-light', name: 'One Light (MPE)', type: 'light', bg: '#fafafa', ink: '#383a42', accent: '#4078f2', success: '#50a14f', danger: '#e45649' },
 ];
 
-// State
 let currentTheme = localStorage.getItem('theme') || 'tokyo-night';
-let currentStep = 'dir';
 let timerInterval = null;
 let startTime = null;
-
-// ═══════════════════════════════════════════════════════════════
-// Initialization
-// ═══════════════════════════════════════════════════════════════
+let isProcessing = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
@@ -54,10 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initEventListeners();
   initWailsEvents();
 });
-
-// ═══════════════════════════════════════════════════════════════
-// Theme Management
-// ═══════════════════════════════════════════════════════════════
 
 function initTheme() {
   applyTheme(currentTheme);
@@ -68,8 +54,6 @@ function applyTheme(themeId) {
   document.documentElement.setAttribute('data-theme', themeId);
   currentTheme = themeId;
   localStorage.setItem('theme', themeId);
-  
-  // Update active state in grid
   document.querySelectorAll('.theme-card').forEach(card => {
     card.classList.toggle('active', card.dataset.id === themeId);
   });
@@ -78,17 +62,13 @@ function applyTheme(themeId) {
 function renderThemeGrid(filter = 'all') {
   const grid = document.getElementById('theme-grid');
   grid.innerHTML = '';
-  
-  const filteredThemes = filter === 'all' 
-    ? themes 
-    : themes.filter(t => t.type === filter);
+  const filteredThemes = filter === 'all' ? themes : themes.filter(t => t.type === filter);
   
   filteredThemes.forEach(theme => {
     const card = document.createElement('div');
     card.className = `theme-card ${theme.id === currentTheme ? 'active' : ''}`;
     card.dataset.id = theme.id;
     card.dataset.type = theme.type;
-    
     card.innerHTML = `
       <div class="theme-preview" style="background-color: ${theme.bg}; color: ${theme.ink};">
         <div class="theme-preview-header">
@@ -101,19 +81,17 @@ function renderThemeGrid(filter = 'all') {
           <div class="theme-preview-line" style="background: ${theme.ink}; opacity: 0.3;"></div>
           <div class="theme-preview-line short" style="background: ${theme.ink}; opacity: 0.2;"></div>
           <div class="theme-preview-line" style="background: ${theme.accent}; opacity: 0.4;"></div>
-          <div class="theme-preview-line short" style="background: ${theme.ink}; opacity: 0.15;"></div>
         </div>
       </div>
       <div class="theme-colors">
-        <div class="theme-color-swatch" style="background: ${theme.bg};" title="Background"></div>
-        <div class="theme-color-swatch" style="background: ${theme.ink};" title="Text"></div>
-        <div class="theme-color-swatch" style="background: ${theme.accent};" title="Accent"></div>
-        <div class="theme-color-swatch" style="background: ${theme.success};" title="Success"></div>
-        <div class="theme-color-swatch" style="background: ${theme.danger};" title="Danger"></div>
+        <div class="theme-color-swatch" style="background: ${theme.bg};"></div>
+        <div class="theme-color-swatch" style="background: ${theme.ink};"></div>
+        <div class="theme-color-swatch" style="background: ${theme.accent};"></div>
+        <div class="theme-color-swatch" style="background: ${theme.success};"></div>
+        <div class="theme-color-swatch" style="background: ${theme.danger};"></div>
       </div>
       <span class="theme-name">${theme.name}</span>
     `;
-    
     card.addEventListener('click', () => applyTheme(theme.id));
     grid.appendChild(card);
   });
@@ -125,13 +103,8 @@ function initThemePanel() {
   const close = document.getElementById('theme-close');
   const filterBtns = document.querySelectorAll('.filter-btn');
   
-  toggle.addEventListener('click', () => {
-    panel.classList.toggle('hidden');
-  });
-  
-  close.addEventListener('click', () => {
-    panel.classList.add('hidden');
-  });
+  toggle.addEventListener('click', () => panel.classList.toggle('hidden'));
+  close.addEventListener('click', () => panel.classList.add('hidden'));
   
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -141,7 +114,6 @@ function initThemePanel() {
     });
   });
   
-  // Close panel when clicking outside
   document.addEventListener('click', (e) => {
     if (!panel.contains(e.target) && !toggle.contains(e.target)) {
       panel.classList.add('hidden');
@@ -149,130 +121,98 @@ function initThemePanel() {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-// Event Listeners
-// ═══════════════════════════════════════════════════════════════
-
 function initEventListeners() {
-  // Directory input
   const dirInput = document.getElementById('dir-input');
   const btnBrowse = document.getElementById('btn-browse');
-  const btnNext = document.getElementById('btn-next');
+  const btnStart = document.getElementById('btn-start');
+  const btnClear = document.getElementById('btn-clear');
+  const btnConfirmYes = document.getElementById('btn-confirm-yes');
+  const btnConfirmNo = document.getElementById('btn-confirm-no');
+  const helpToggle = document.getElementById('help-toggle');
+  const helpClose = document.getElementById('help-close');
+  const helpDialog = document.getElementById('help-dialog');
   
   btnBrowse.addEventListener('click', async () => {
     if (window.go && window.go.main && window.go.main.App) {
       const dir = await window.go.main.App.PickDirectory();
       if (dir) {
         dirInput.value = dir;
+        validateDir(dir);
       }
     }
   });
   
-  btnNext.addEventListener('click', handleNextFromDir);
-  dirInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleNextFromDir();
+  dirInput.addEventListener('change', () => {
+    const dir = dirInput.value.trim();
+    if (dir) validateDir(dir);
   });
   
-  // Step selection
-  const btnBack = document.getElementById('btn-back');
-  const btnStart = document.getElementById('btn-start');
+  dirInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const dir = dirInput.value.trim();
+      if (dir) validateDir(dir);
+    }
+  });
   
-  btnBack.addEventListener('click', () => showSection('dir'));
   btnStart.addEventListener('click', handleStartProcessing);
-  
-  // Confirm dialog
-  const btnConfirmYes = document.getElementById('btn-confirm-yes');
-  const btnConfirmNo = document.getElementById('btn-confirm-no');
-  
+  btnClear.addEventListener('click', () => { document.getElementById('output').textContent = ''; });
   btnConfirmYes.addEventListener('click', () => handleConfirm(true));
   btnConfirmNo.addEventListener('click', () => handleConfirm(false));
   
-  // Done section
-  const btnContinue = document.getElementById('btn-continue');
-  const btnNewDir = document.getElementById('btn-new-dir');
-  const btnQuit = document.getElementById('btn-quit');
-  
-  btnContinue.addEventListener('click', () => showSection('select'));
-  btnNewDir.addEventListener('click', () => {
-    document.getElementById('dir-input').value = '';
-    showSection('dir');
-  });
-  btnQuit.addEventListener('click', () => {
-    if (window.go && window.go.main && window.go.main.App) {
-      window.go.main.App.Quit();
-    }
+  helpToggle.addEventListener('click', () => helpDialog.classList.remove('hidden'));
+  helpClose.addEventListener('click', () => helpDialog.classList.add('hidden'));
+  helpDialog.addEventListener('click', (e) => {
+    if (e.target === helpDialog) helpDialog.classList.add('hidden');
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-// Wails Events
-// ═══════════════════════════════════════════════════════════════
+async function validateDir(dir) {
+  const dirError = document.getElementById('dir-error');
+  const dirStatus = document.getElementById('dir-status');
+  const dirPath = document.getElementById('dir-path');
+  
+  try {
+    if (window.go && window.go.main && window.go.main.App) {
+      const validDir = await window.go.main.App.ValidateDirectory(dir);
+      dirError.classList.add('hidden');
+      dirStatus.classList.remove('hidden');
+      dirPath.textContent = validDir;
+    }
+  } catch (err) {
+    dirError.textContent = err;
+    dirError.classList.remove('hidden');
+    dirStatus.classList.add('hidden');
+  }
+}
 
 function initWailsEvents() {
-  // Wait for Wails runtime to be ready
-  if (window.runtime) {
-    setupEventListeners();
-  } else {
-    window.addEventListener('load', setupEventListeners);
-  }
+  const check = setInterval(() => {
+    if (window.runtime) {
+      clearInterval(check);
+      setupEventListeners();
+    }
+  }, 50);
 }
 
 function setupEventListeners() {
   if (!window.runtime) return;
   
-  // Listen for output events
   window.runtime.EventsOn('output', (text) => {
     appendOutput(text);
   });
   
-  // Listen for confirm requests
   window.runtime.EventsOn('confirm-request', (message) => {
     showConfirmDialog(message);
   });
   
-  // Listen for completion
   window.runtime.EventsOn('processing-complete', (duration) => {
     handleProcessingComplete(duration);
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-// Section Navigation
-// ═══════════════════════════════════════════════════════════════
-
-function showSection(section) {
-  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-  document.getElementById(`step-${section}`).classList.remove('hidden');
-  currentStep = section;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Directory Handling
-// ═══════════════════════════════════════════════════════════════
-
-async function handleNextFromDir() {
-  const dirInput = document.getElementById('dir-input');
-  const dirError = document.getElementById('dir-error');
-  const dir = dirInput.value.trim();
-  
-  try {
-    if (window.go && window.go.main && window.go.main.App) {
-      const validDir = await window.go.main.App.ValidateDirectory(dir);
-      document.getElementById('current-dir').textContent = `工作目录: ${validDir}`;
-      showSection('select');
-      dirError.classList.add('hidden');
-    }
-  } catch (err) {
-    dirError.textContent = err;
-    dirError.classList.remove('hidden');
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Processing
-// ═══════════════════════════════════════════════════════════════
-
 async function handleStartProcessing() {
+  if (isProcessing) return;
+  
   const dirInput = document.getElementById('dir-input');
   const dir = dirInput.value.trim();
   
@@ -283,24 +223,22 @@ async function handleStartProcessing() {
     document.getElementById('step4').checked,
   ];
   
-  // Validate at least one step selected
   if (!steps.some(s => s)) {
-    alert('请至少选择一个步骤');
+    appendOutput('错误: 请至少选择一个步骤\n');
     return;
   }
   
-  // Clear output
+  isProcessing = true;
   document.getElementById('output').textContent = '';
-  
-  // Show running section
-  showSection('running');
-  
-  // Start timer
   startTimer();
   
-  // Update status
-  document.getElementById('status-text').className = 'status processing';
-  document.getElementById('status-text').textContent = '处理中...';
+  const statusEl = document.getElementById('status-text');
+  statusEl.className = 'status processing';
+  statusEl.textContent = '处理中...';
+  
+  const btnStart = document.getElementById('btn-start');
+  btnStart.disabled = true;
+  btnStart.style.opacity = '0.6';
   
   try {
     if (window.go && window.go.main && window.go.main.App) {
@@ -308,7 +246,16 @@ async function handleStartProcessing() {
     }
   } catch (err) {
     appendOutput(`错误: ${err}\n`);
+    resetProcessingState();
   }
+}
+
+function resetProcessingState() {
+  isProcessing = false;
+  const btnStart = document.getElementById('btn-start');
+  btnStart.disabled = false;
+  btnStart.style.opacity = '1';
+  stopTimer();
 }
 
 function appendOutput(text) {
@@ -320,10 +267,7 @@ function appendOutput(text) {
 function startTimer() {
   startTime = Date.now();
   const timerEl = document.getElementById('timer');
-  
-  if (timerInterval) {
-    clearInterval(timerInterval);
-  }
+  if (timerInterval) clearInterval(timerInterval);
   
   timerInterval = setInterval(() => {
     const elapsed = Date.now() - startTime;
@@ -340,10 +284,6 @@ function stopTimer() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// Confirmation Dialog
-// ═══════════════════════════════════════════════════════════════
-
 function showConfirmDialog(message) {
   document.getElementById('confirm-message').textContent = message;
   document.getElementById('confirm-dialog').classList.remove('hidden');
@@ -355,30 +295,19 @@ function hideConfirmDialog() {
 
 async function handleConfirm(confirmed) {
   hideConfirmDialog();
-  
-  if (window.go && window.go.main && window.go.main.App) {
-    await window.go.main.App.ConfirmStep4(confirmed);
+  try {
+    if (window.go && window.go.main && window.go.main.App) {
+      const err = await window.go.main.App.ConfirmStep4(confirmed);
+      if (err) appendOutput(`确认失败: ${err}\n`);
+    }
+  } catch (err) {
+    appendOutput(`确认错误: ${err}\n`);
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// Completion
-// ═══════════════════════════════════════════════════════════════
-
 function handleProcessingComplete(duration) {
-  stopTimer();
-  
-  // Update status
-  document.getElementById('status-text').className = 'status success';
-  document.getElementById('status-text').textContent = '✓ 完成';
-  
-  // Copy output to done section
-  const output = document.getElementById('output').textContent;
-  document.getElementById('final-output').textContent = output;
-  document.getElementById('total-time').textContent = `耗时: ${duration}`;
-  
-  // Show done section after a brief delay
-  setTimeout(() => {
-    showSection('done');
-  }, 500);
+  resetProcessingState();
+  const statusEl = document.getElementById('status-text');
+  statusEl.className = 'status success';
+  statusEl.textContent = `完成 ${duration}`;
 }

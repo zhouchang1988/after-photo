@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>After Photo - 照片整理工具</title>
+  <title>After Photo</title>
   <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
@@ -12,11 +12,17 @@
     <header class="header">
       <div class="header-left">
         <h1 class="logo">After Photo</h1>
-        <span class="version">v1.0</span>
       </div>
       <div class="header-right">
+        <button id="help-toggle" class="btn-icon" title="关于">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
         <button id="theme-toggle" class="btn-icon" title="切换主题">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"/>
             <line x1="12" y1="1" x2="12" y2="3"/>
             <line x1="12" y1="21" x2="12" y2="23"/>
@@ -31,6 +37,38 @@
       </div>
     </header>
 
+    <!-- Help Dialog -->
+    <div id="help-dialog" class="dialog hidden">
+      <div class="dialog-content help-content">
+        <div class="help-header">
+          <h2>After Photo</h2>
+          <button id="help-close" class="btn-icon">&times;</button>
+        </div>
+        <div class="help-body">
+          <p class="help-tagline">连拍摄影师的效率工具</p>
+          <p class="help-desc">自动去重、智能选优，让整理照片不再拖垮创作节奏。</p>
+          
+          <h4>核心功能</h4>
+          <ul class="help-list">
+            <li><strong>按类型拆分</strong> — JPG、RAW、视频自动归类</li>
+            <li><strong>重复检测</strong> — pHash 感知哈希 + 30 秒时间阈值</li>
+            <li><strong>智能选优</strong> — 基于清晰度和亮度自动评分</li>
+            <li><strong>RAW 清理</strong> — 一键清理无对应 JPG 的 RAW 文件</li>
+          </ul>
+          
+          <h4>使用方法</h4>
+          <ol class="help-list">
+            <li>选择照片目录</li>
+            <li>勾选需要执行的步骤</li>
+            <li>点击「开始处理」</li>
+          </ol>
+          
+          <h4>支持格式</h4>
+          <p class="help-formats">JPG · JPEG · CR2 · CR3 · NEF · ARW · DNG · ORF · RW2 · PEF · MP4 · MOV</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Theme Panel -->
     <div id="theme-panel" class="theme-panel hidden">
       <div class="theme-panel-header">
@@ -42,112 +80,110 @@
         </div>
         <button id="theme-close" class="btn-icon">&times;</button>
       </div>
-      <div id="theme-grid" class="theme-grid">
-        <!-- Themes will be inserted here -->
-      </div>
+      <div id="theme-grid" class="theme-grid"></div>
     </div>
 
     <!-- Main Content -->
     <main class="main">
-      <!-- Step 1: Directory Input -->
-      <section id="step-dir" class="section active">
-        <div class="section-header">
-          <h2>选择照片目录</h2>
-          <p class="section-desc">选择要整理的照片目录，或留空使用程序所在目录</p>
-        </div>
-        <div class="input-group">
-          <input type="text" id="dir-input" placeholder="输入照片目录路径..." class="input">
-          <button id="btn-browse" class="btn btn-secondary">浏览...</button>
-        </div>
-        <div id="dir-error" class="error hidden"></div>
-        <div class="section-actions">
-          <button id="btn-next" class="btn btn-primary">下一步</button>
-        </div>
-      </section>
-
-      <!-- Step 2: Select Steps -->
-      <section id="step-select" class="section hidden">
-        <div class="section-header">
-          <h2>选择执行步骤</h2>
-          <p class="section-desc" id="current-dir"></p>
-        </div>
-        <div class="steps-list">
-          <label class="step-item">
-            <input type="checkbox" id="step1" checked>
-            <div class="step-content">
-              <span class="step-name">按文件类型拆分目录</span>
-              <span class="step-desc">JPG→jpg/ RAW→raw/ 视频→video/</span>
-            </div>
-          </label>
-          <label class="step-item">
-            <input type="checkbox" id="step2" checked>
-            <div class="step-content">
-              <span class="step-name">检测并归类重复照片</span>
-              <span class="step-desc">基于感知哈希算法识别相似照片</span>
-            </div>
-          </label>
-          <label class="step-item">
-            <input type="checkbox" id="step3" checked>
-            <div class="step-content">
-              <span class="step-name">在重复照片中选择最佳</span>
-              <span class="step-desc">基于清晰度和亮度自动评分</span>
-            </div>
-          </label>
-          <label class="step-item danger">
-            <input type="checkbox" id="step4">
-            <div class="step-content">
-              <span class="step-name">删除多余的RAW文件</span>
-              <span class="step-desc">删除没有对应JPG的RAW文件</span>
-            </div>
-          </label>
-        </div>
-        <div class="section-actions">
-          <button id="btn-back" class="btn btn-secondary">返回</button>
-          <button id="btn-start" class="btn btn-primary">开始执行</button>
-        </div>
-      </section>
-
-      <!-- Step 3: Running -->
-      <section id="step-running" class="section hidden">
-        <div class="section-header">
-          <h2>执行中</h2>
-          <div class="status-bar">
-            <span id="status-text" class="status processing">处理中...</span>
-            <span id="timer" class="timer">00:00</span>
+      <!-- Left Panel -->
+      <aside class="sidebar">
+        <!-- Directory Selection -->
+        <section class="sidebar-section">
+          <h3 class="sidebar-title">照片目录</h3>
+          <div class="dir-input-group">
+            <input type="text" id="dir-input" placeholder="输入路径或点击浏览..." class="input">
+            <button id="btn-browse" class="btn-icon" title="浏览">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              </svg>
+            </button>
           </div>
+          <div id="dir-error" class="error hidden"></div>
+          <div id="dir-status" class="dir-status hidden">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <span id="dir-path"></span>
+          </div>
+        </section>
+
+        <!-- Steps Selection -->
+        <section class="sidebar-section">
+          <h3 class="sidebar-title">处理步骤</h3>
+          <div class="steps-list">
+            <label class="step-item">
+              <input type="checkbox" id="step1" checked>
+              <div class="step-content">
+                <span class="step-name">按类型拆分</span>
+                <span class="step-desc">JPG / RAW / 视频</span>
+              </div>
+            </label>
+            <label class="step-item">
+              <input type="checkbox" id="step2" checked>
+              <div class="step-content">
+                <span class="step-name">重复检测</span>
+                <span class="step-desc">pHash 感知哈希</span>
+              </div>
+            </label>
+            <label class="step-item">
+              <input type="checkbox" id="step3" checked>
+              <div class="step-content">
+                <span class="step-name">智能选优</span>
+                <span class="step-desc">清晰度 + 亮度评分</span>
+              </div>
+            </label>
+            <label class="step-item danger">
+              <input type="checkbox" id="step4">
+              <div class="step-content">
+                <span class="step-name">RAW 清理</span>
+                <span class="step-desc">删除无对应 JPG 的 RAW</span>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <!-- Action Button -->
+        <section class="sidebar-section sidebar-actions">
+          <button id="btn-start" class="btn btn-primary btn-block">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            开始处理
+          </button>
+          <div class="action-status">
+            <span id="status-text" class="status idle">就绪</span>
+            <span id="timer" class="timer"></span>
+          </div>
+        </section>
+      </aside>
+
+      <!-- Right Panel - Output -->
+      <section class="content">
+        <div class="content-header">
+          <h3>执行日志</h3>
+          <button id="btn-clear" class="btn-icon" title="清空日志">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
         </div>
         <div id="output" class="output"></div>
-        
-        <!-- Confirm Dialog -->
-        <div id="confirm-dialog" class="dialog hidden">
-          <div class="dialog-content">
-            <h3>确认操作</h3>
-            <p id="confirm-message"></p>
-            <div class="dialog-actions">
-              <button id="btn-confirm-no" class="btn btn-secondary">取消</button>
-              <button id="btn-confirm-yes" class="btn btn-danger">确认删除</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Step 4: Done -->
-      <section id="step-done" class="section hidden">
-        <div class="section-header">
-          <h2>执行完成</h2>
-          <div class="status-bar">
-            <span class="status success">✓ 完成</span>
-            <span id="total-time" class="timer"></span>
-          </div>
-        </div>
-        <div id="final-output" class="output"></div>
-        <div class="section-actions">
-          <button id="btn-continue" class="btn btn-secondary">继续其他步骤</button>
-          <button id="btn-new-dir" class="btn btn-secondary">整理其他文件夹</button>
-          <button id="btn-quit" class="btn btn-primary">退出程序</button>
-        </div>
       </section>
     </main>
+
+    <!-- Confirm Dialog -->
+    <div id="confirm-dialog" class="dialog hidden">
+      <div class="dialog-content">
+        <h3>确认操作</h3>
+        <p id="confirm-message"></p>
+        <div class="dialog-actions">
+          <button id="btn-confirm-no" class="btn btn-secondary">取消</button>
+          <button id="btn-confirm-yes" class="btn btn-danger">确认删除</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="./src/main.js"></script>
