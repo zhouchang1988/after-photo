@@ -78,9 +78,6 @@ cd after-photo
 # macOS
 ./bin/after-photo-mac
 
-# Windows
-bin\after-photo.exe
-
 # 或直接运行
 go run main.go
 ```

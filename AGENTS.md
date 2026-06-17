@@ -26,7 +26,8 @@ After Photo 是一个面向连拍摄影师的桌面效率工具，解决"海量�
 | 目录 | 职责 | 关键说明 | AGENTS.md 链接 |
 |---|---|---|---|
 | `pkg/` | 核心功能包 | 4 个步骤的业务逻辑、配置、图像处理算法 | [./pkg/AGENTS.md](./pkg/AGENTS.md) |
-| `bin/` | 编译输出 | macOS/Windows 可执行文件，不纳入版本控制 | 跳过 |
+| `gui/` | GUI 模块 | Wails v2 桌面应用，封装 pkg 为图形界面 | [./gui/AGENTS.md](./gui/AGENTS.md) |
+| `bin/` | 编译输出 | macOS 可执行文件，不纳入版本控制 | 跳过 |
 | `test/` | 测试数据 | `input/` 原始测试文件，`output/` 预期结果 | 父级摘要 |
 
 ## 3. 核心业务场景索引

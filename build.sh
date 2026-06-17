@@ -67,17 +67,6 @@ if [ "$BUILD_TUI" = true ]; then
         exit 1
     fi
 
-    # Windows
-    echo ""
-    echo "编译 Windows 版本..."
-    GOOS=windows GOARCH=amd64 go build -o bin/after-photo.exe
-    if [ $? -eq 0 ]; then
-        echo "✓ Windows 版本编译成功: bin/after-photo.exe"
-    else
-        echo "✗ Windows 版本编译失败"
-        exit 1
-    fi
-
     echo ""
     echo "TUI 编译完成！"
     ls -lh bin/
