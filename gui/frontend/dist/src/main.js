@@ -1,313 +1,336 @@
-const themes = [
-  { id: 'tokyo-night', name: 'Tokyo Night', type: 'dark', bg: '#1a1b26', ink: '#a9b1d6', accent: '#7aa2f7', success: '#9ece6a', danger: '#f7768e' },
-  { id: 'dracula', name: 'Dracula', type: 'dark', bg: '#282a36', ink: '#f8f8f2', accent: '#ff79c6', success: '#50fa7b', danger: '#ff5555' },
-  { id: 'catppuccin-mocha', name: 'Catppuccin Mocha', type: 'dark', bg: '#1e1e2e', ink: '#cdd6f4', accent: '#cba6f7', success: '#a6e3a1', danger: '#f38ba8' },
-  { id: 'catppuccin-macchiato', name: 'Catppuccin Macchiato', type: 'dark', bg: '#181825', ink: '#cad3f8', accent: '#c7a4f5', success: '#a6da95', danger: '#ed8796' },
-  { id: 'nord', name: 'Nord', type: 'dark', bg: '#2e3440', ink: '#d8dee9', accent: '#88c0d0', success: '#a3be8c', danger: '#bf616a' },
-  { id: 'one-dark-pro', name: 'One Dark Pro', type: 'dark', bg: '#282c34', ink: '#abb2bf', accent: '#4d78cc', success: '#98c379', danger: '#e06c75' },
-  { id: 'gruvbox-dark', name: 'Gruvbox Dark', type: 'dark', bg: '#282828', ink: '#ebdbb2', accent: '#fe8019', success: '#b8bb26', danger: '#fb4934' },
-  { id: 'kanagawa', name: 'Kanagawa Wave', type: 'dark', bg: '#1f1f28', ink: '#dcd7ba', accent: '#658594', success: '#76956a', danger: '#c34043' },
-  { id: 'rose-pine', name: 'Rose Pine', type: 'dark', bg: '#191724', ink: '#e0def4', accent: '#31748f', success: '#9ccfd8', danger: '#eb6f92' },
-  { id: 'github-dark', name: 'GitHub Dark', type: 'dark', bg: '#0d1117', ink: '#e6edf3', accent: '#1f6feb', success: '#3fb950', danger: '#f85149' },
-  { id: 'material-palenight', name: 'Material Palenight', type: 'dark', bg: '#292d3e', ink: '#eeffff', accent: '#80cbc4', success: '#c3e88d', danger: '#ff5370' },
-  { id: 'ayu-dark', name: 'Ayu Dark', type: 'dark', bg: '#0b0e14', ink: '#bfbdb6', accent: '#e6b450', success: '#c2d94c', danger: '#f07178' },
-  { id: 'vitesse-dark', name: 'Vitesse Dark', type: 'dark', bg: '#121212', ink: '#dbd7ca', accent: '#4d9375', success: '#80a665', danger: '#cb7676' },
-  { id: 'buddy-dark', name: 'Default Dark', type: 'dark', bg: '#18181a', ink: '#e8e8e3', accent: '#339cff', success: '#40c977', danger: '#fa423e' },
-  { id: 'codex-dark', name: 'Codex Dark', type: 'dark', bg: '#111111', ink: '#ffffff', accent: '#0169cc', success: '#40c977', danger: '#fa423e' },
-  { id: 'atom-material', name: 'Atom Material', type: 'dark', bg: '#263238', ink: '#eeffff', accent: '#82aaff', success: '#c3e88d', danger: '#f07178' },
-  { id: 'gothic', name: 'Gothic', type: 'dark', bg: '#0e0e0e', ink: '#c7c7c7', accent: '#fe5e3a', success: '#40c977', danger: '#b33b2e' },
-  { id: 'monokai', name: 'Monokai', type: 'dark', bg: '#282828', ink: '#f8f8f2', accent: '#a6e22e', success: '#a6e22e', danger: '#f92672' },
-  { id: 'slack-dark', name: 'Slack Dark', type: 'dark', bg: '#1a1d21', ink: '#d1d2d3', accent: '#1264a3', success: '#2bac76', danger: '#e01e5a' },
-  { id: 'dark-plus', name: 'Dark+', type: 'dark', bg: '#1e1e1e', ink: '#d4d4d4', accent: '#569cd6', success: '#6a9955', danger: '#f44747' },
-  { id: 'min-dark', name: 'Minimal Dark', type: 'dark', bg: '#1a1a1a', ink: '#e0e0e0', accent: '#4da6ff', success: '#4caf50', danger: '#f44336' },
-  { id: 'catppuccin-latte', name: 'Catppuccin Latte', type: 'light', bg: '#eff1f5', ink: '#4c4f69', accent: '#8839ef', success: '#40a02b', danger: '#d20f39' },
-  { id: 'github-light', name: 'GitHub Light', type: 'light', bg: '#ffffff', ink: '#1f2328', accent: '#0969da', success: '#1a7f37', danger: '#d1242f' },
-  { id: 'one-light', name: 'One Light', type: 'light', bg: '#fafafa', ink: '#383a42', accent: '#4078f2', success: '#50a14f', danger: '#e45649' },
-  { id: 'solarized-light', name: 'Solarized Light', type: 'light', bg: '#fdf6e3', ink: '#657b83', accent: '#268bd2', success: '#859900', danger: '#dc322f' },
-  { id: 'min-light', name: 'Minimal Light', type: 'light', bg: '#ffffff', ink: '#1a1a1a', accent: '#0066cc', success: '#22863a', danger: '#cb2431' },
-  { id: 'slack-light', name: 'Slack Light', type: 'light', bg: '#ffffff', ink: '#1d1c1d', accent: '#1264a3', success: '#2bac76', danger: '#e01e5a' },
-  { id: 'light-plus', name: 'Light+', type: 'light', bg: '#ffffff', ink: '#333333', accent: '#0066cc', success: '#22863a', danger: '#cb2431' },
-  { id: 'buddy-light', name: 'Default Light', type: 'light', bg: '#ffffff', ink: '#1a1a1a', accent: '#0066cc', success: '#28a745', danger: '#dc3545' },
-  { id: 'vitesse-light', name: 'Vitesse Light', type: 'light', bg: '#f7f7f7', ink: '#1a1a1a', accent: '#2993a6', success: '#4e8c2f', danger: '#cb4a5a' },
-  { id: 'mpe-atom-light', name: 'Atom Light', type: 'light', bg: '#fafafa', ink: '#383a42', accent: '#4078f2', success: '#50a14f', danger: '#e45649' },
-  { id: 'mpe-one-light', name: 'One Light (MPE)', type: 'light', bg: '#fafafa', ink: '#383a42', accent: '#4078f2', success: '#50a14f', danger: '#e45649' },
+/* After Photo GUI — 前端逻辑
+ * 后端方法：window.go.main.App.*
+ * 后端事件：log / progress / step / confirm / done
+ */
+
+'use strict';
+
+// ---------- 步骤配置（与后端 stepDefs 顺序一致） ----------
+
+const STEPS = [
+  { name: '类型拆分', desc: '按 JPG / RAW / 视频归类到子目录', danger: false, checked: true },
+  { name: '重复检测', desc: 'pHash 感知哈希 + 时间阈值分组', danger: false, checked: true },
+  { name: '智能选优', desc: '清晰度与亮度评分，标记最佳照片', danger: false, checked: true },
+  { name: 'RAW 清理', desc: '删除无对应 JPG 的 RAW 文件', danger: true, checked: false },
 ];
 
-let currentTheme = localStorage.getItem('theme') || 'tokyo-night';
-let timerInterval = null;
-let startTime = null;
-let isProcessing = false;
+// ---------- DOM ----------
 
-document.addEventListener('DOMContentLoaded', () => {
-  initTheme();
-  initThemePanel();
-  initEventListeners();
-  initWailsEvents();
-});
+const $ = (id) => document.getElementById(id);
+const els = {
+  dirPath: $('dir-path'), dirError: $('dir-error'), dirStats: $('dir-stats'),
+  statJpg: $('stat-jpg'), statRaw: $('stat-raw'), statVideo: $('stat-video'), statSize: $('stat-size'),
+  steps: $('steps'),
+  btnBrowse: $('btn-browse'), btnRun: $('btn-run'), btnCancel: $('btn-cancel'),
+  pill: $('status-pill'), fill: $('progress-fill'), progressText: $('progress-text'),
+  elapsed: $('elapsed'), console: $('console'), statusbar: $('statusbar'),
+  btnScroll: $('btn-scroll'), btnClear: $('btn-clear'), btnTheme: $('btn-theme'),
+  modalMask: $('modal-mask'), modalMsg: $('modal-msg'),
+  btnModalYes: $('btn-modal-yes'), btnModalNo: $('btn-modal-no'),
+};
 
-function initTheme() {
-  applyTheme(currentTheme);
-  renderThemeGrid();
-}
+// ---------- 状态 ----------
 
-function applyTheme(themeId) {
-  document.documentElement.setAttribute('data-theme', themeId);
-  currentTheme = themeId;
-  localStorage.setItem('theme', themeId);
-  document.querySelectorAll('.theme-card').forEach(card => {
-    card.classList.toggle('active', card.dataset.id === themeId);
-  });
-}
+const state = {
+  dir: '',
+  running: false,
+  autoScroll: true,
+  timerId: null,
+  startAt: 0,
+};
 
-function renderThemeGrid(filter = 'all') {
-  const grid = document.getElementById('theme-grid');
-  grid.innerHTML = '';
-  const filteredThemes = filter === 'all' ? themes : themes.filter(t => t.type === filter);
-  
-  filteredThemes.forEach(theme => {
+// ---------- 步骤卡片 ----------
+
+const ICON_SPIN = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.2-8.56"/></svg>';
+const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+const ICON_DOT = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="3.5"/></svg>';
+
+function buildSteps() {
+  els.steps.innerHTML = '';
+  STEPS.forEach((s, i) => {
     const card = document.createElement('div');
-    card.className = `theme-card ${theme.id === currentTheme ? 'active' : ''}`;
-    card.dataset.id = theme.id;
-    card.dataset.type = theme.type;
+    card.className = 'step' + (s.danger ? ' danger' : '') + (s.checked ? ' on' : '');
+    card.dataset.index = i;
     card.innerHTML = `
-      <div class="theme-preview" style="background-color: ${theme.bg}; color: ${theme.ink};">
-        <div class="theme-preview-header">
-          <span class="theme-preview-dot" style="background: ${theme.danger};"></span>
-          <span class="theme-preview-dot" style="background: ${theme.success};"></span>
-          <span class="theme-preview-dot" style="background: ${theme.accent};"></span>
-        </div>
-        <div class="theme-preview-body">
-          <span class="theme-preview-title" style="color: ${theme.ink};">${theme.name}</span>
-          <div class="theme-preview-line" style="background: ${theme.ink}; opacity: 0.3;"></div>
-          <div class="theme-preview-line short" style="background: ${theme.ink}; opacity: 0.2;"></div>
-          <div class="theme-preview-line" style="background: ${theme.accent}; opacity: 0.4;"></div>
-        </div>
+      <span class="step-num">${i + 1}</span>
+      <div class="step-info">
+        <span class="step-name">${s.name}</span>
+        <span class="step-desc">${s.desc}</span>
       </div>
-      <div class="theme-colors">
-        <div class="theme-color-swatch" style="background: ${theme.bg};"></div>
-        <div class="theme-color-swatch" style="background: ${theme.ink};"></div>
-        <div class="theme-color-swatch" style="background: ${theme.accent};"></div>
-        <div class="theme-color-swatch" style="background: ${theme.success};"></div>
-        <div class="theme-color-swatch" style="background: ${theme.danger};"></div>
-      </div>
-      <span class="theme-name">${theme.name}</span>
-    `;
-    card.addEventListener('click', () => applyTheme(theme.id));
-    grid.appendChild(card);
-  });
-}
-
-function initThemePanel() {
-  const toggle = document.getElementById('theme-toggle');
-  const panel = document.getElementById('theme-panel');
-  const close = document.getElementById('theme-close');
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  
-  toggle.addEventListener('click', () => panel.classList.toggle('hidden'));
-  close.addEventListener('click', () => panel.classList.add('hidden'));
-  
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderThemeGrid(btn.dataset.filter);
+      <span class="step-state">${ICON_DOT}</span>`;
+    card.addEventListener('click', () => {
+      if (state.running) return;
+      s.checked = !s.checked;
+      card.classList.toggle('on', s.checked);
     });
-  });
-  
-  document.addEventListener('click', (e) => {
-    if (!panel.contains(e.target) && !toggle.contains(e.target)) {
-      panel.classList.add('hidden');
-    }
+    els.steps.appendChild(card);
   });
 }
 
-function initEventListeners() {
-  const dirInput = document.getElementById('dir-input');
-  const btnBrowse = document.getElementById('btn-browse');
-  const btnStart = document.getElementById('btn-start');
-  const btnClear = document.getElementById('btn-clear');
-  const btnConfirmYes = document.getElementById('btn-confirm-yes');
-  const btnConfirmNo = document.getElementById('btn-confirm-no');
-  const helpToggle = document.getElementById('help-toggle');
-  const helpClose = document.getElementById('help-close');
-  const helpDialog = document.getElementById('help-dialog');
-  
-  btnBrowse.addEventListener('click', async () => {
-    if (window.go && window.go.main && window.go.main.App) {
-      const dir = await window.go.main.App.PickDirectory();
-      if (dir) {
-        dirInput.value = dir;
-        validateDir(dir);
+function setStepState(index, cls) {
+  const card = els.steps.children[index];
+  if (!card) return;
+  card.classList.remove('running', 'finished');
+  const icon = card.querySelector('.step-state');
+  if (cls === 'running') { card.classList.add('running'); icon.innerHTML = ICON_SPIN; }
+  else if (cls === 'finished') { card.classList.add('finished'); icon.innerHTML = ICON_CHECK; }
+  else icon.innerHTML = ICON_DOT;
+}
+
+function resetStepStates() {
+  for (let i = 0; i < STEPS.length; i++) setStepState(i, null);
+}
+
+// ---------- ANSI 渲染 ----------
+
+const FG = { 31: 'fg-red', 32: 'fg-green', 33: 'fg-yellow', 34: 'fg-blue', 35: 'fg-magenta', 36: 'fg-cyan', 37: 'fg-white' };
+const ansiState = { fg: null, bold: false };
+let ansiPending = '';
+
+function escHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function ansiToHtml(text) {
+  text = ansiPending + text;
+  ansiPending = '';
+  let html = '';
+  let i = 0;
+  const openSpan = () => {
+    const cls = [ansiState.fg, ansiState.bold ? 'bold' : null].filter(Boolean).join(' ');
+    return cls ? `<span class="${cls}">` : '';
+  };
+  while (i < text.length) {
+    const esc = text.indexOf('\x1b[', i);
+    if (esc === -1) break;
+    if (esc > i) html += openSpan() + escHtml(text.slice(i, esc)) + (openSpan() ? '</span>' : '');
+    let j = esc + 2;
+    while (j < text.length && !(text.charCodeAt(j) >= 0x40 && text.charCodeAt(j) <= 0x7e)) j++;
+    if (j >= text.length) { ansiPending = text.slice(esc); return html; } // 转义序列跨块，留存
+    const code = text[j];
+    if (code === 'm') {
+      for (const n of text.slice(esc + 2, j).split(';')) {
+        const v = parseInt(n, 10) || 0;
+        if (v === 0) { ansiState.fg = null; ansiState.bold = false; }
+        else if (v === 1) ansiState.bold = true;
+        else if (FG[v]) ansiState.fg = FG[v];
+        else if (v === 39) ansiState.fg = null;
       }
     }
-  });
-  
-  dirInput.addEventListener('change', () => {
-    const dir = dirInput.value.trim();
-    if (dir) validateDir(dir);
-  });
-  
-  dirInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      const dir = dirInput.value.trim();
-      if (dir) validateDir(dir);
-    }
-  });
-  
-  btnStart.addEventListener('click', handleStartProcessing);
-  btnClear.addEventListener('click', () => { document.getElementById('output').textContent = ''; });
-  btnConfirmYes.addEventListener('click', () => handleConfirm(true));
-  btnConfirmNo.addEventListener('click', () => handleConfirm(false));
-  
-  helpToggle.addEventListener('click', () => helpDialog.classList.remove('hidden'));
-  helpClose.addEventListener('click', () => helpDialog.classList.add('hidden'));
-  helpDialog.addEventListener('click', (e) => {
-    if (e.target === helpDialog) helpDialog.classList.add('hidden');
-  });
+    i = j + 1;
+  }
+  if (i < text.length) html += openSpan() + escHtml(text.slice(i)) + (openSpan() ? '</span>' : '');
+  return html;
 }
 
-async function validateDir(dir) {
-  const dirError = document.getElementById('dir-error');
-  const dirStatus = document.getElementById('dir-status');
-  const dirPath = document.getElementById('dir-path');
-  
-  try {
-    if (window.go && window.go.main && window.go.main.App) {
-      const validDir = await window.go.main.App.ValidateDirectory(dir);
-      dirError.classList.add('hidden');
-      dirStatus.classList.remove('hidden');
-      dirPath.textContent = validDir;
-    }
-  } catch (err) {
-    dirError.textContent = err;
-    dirError.classList.remove('hidden');
-    dirStatus.classList.add('hidden');
+function appendLog(text) {
+  els.console.insertAdjacentHTML('beforeend', ansiToHtml(text));
+  // 防止超长日志拖垮 DOM
+  while (els.console.childNodes.length > 4000) {
+    els.console.removeChild(els.console.firstChild);
+  }
+  if (state.autoScroll) els.console.scrollTop = els.console.scrollHeight;
+}
+
+// ---------- 状态展示 ----------
+
+const PILLS = {
+  idle: ['pill-idle', '就绪'],
+  running: ['pill-running', '处理中'],
+  done: ['pill-done', '完成'],
+  error: ['pill-error', '已取消'],
+};
+
+function setPill(kind) {
+  const [cls, label] = PILLS[kind];
+  els.pill.className = 'pill ' + cls;
+  els.pill.textContent = label;
+}
+
+function setProgress(cur, total, msg) {
+  if (total > 0) {
+    els.fill.classList.remove('indeterminate');
+    els.fill.style.width = Math.min(100, (cur / total) * 100) + '%';
+    els.progressText.textContent = `${cur}/${total}  ${msg || ''}`;
+  } else {
+    els.fill.classList.add('indeterminate');
+    els.progressText.textContent = msg || '';
   }
 }
 
-function initWailsEvents() {
-  const check = setInterval(() => {
-    if (window.runtime) {
-      clearInterval(check);
-      setupEventListeners();
-    }
-  }, 50);
+function resetProgress() {
+  els.fill.classList.remove('indeterminate');
+  els.fill.style.width = '0%';
+  els.progressText.textContent = '';
 }
 
-function setupEventListeners() {
-  if (!window.runtime) return;
-  
-  window.runtime.EventsOn('output', (text) => {
-    appendOutput(text);
-  });
-  
-  window.runtime.EventsOn('confirm-request', (message) => {
-    showConfirmDialog(message);
-  });
-  
-  window.runtime.EventsOn('processing-complete', (duration) => {
-    handleProcessingComplete(duration);
-  });
+function fmtElapsed(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  return m > 0 ? `${m}m ${s % 60}s` : `${s}s`;
 }
 
-async function handleStartProcessing() {
-  if (isProcessing) return;
-  
-  const dirInput = document.getElementById('dir-input');
-  const dir = dirInput.value.trim();
-  
-  const steps = [
-    document.getElementById('step1').checked,
-    document.getElementById('step2').checked,
-    document.getElementById('step3').checked,
-    document.getElementById('step4').checked,
-  ];
-  
-  if (!steps.some(s => s)) {
-    appendOutput('错误: 请至少选择一个步骤\n');
+function fmtSize(bytes) {
+  if (bytes >= 1 << 30) return (bytes / (1 << 30)).toFixed(1) + 'G';
+  if (bytes >= 1 << 20) return (bytes / (1 << 20)).toFixed(1) + 'M';
+  if (bytes >= 1 << 10) return (bytes / (1 << 10)).toFixed(0) + 'K';
+  return bytes + 'B';
+}
+
+// ---------- 目录 ----------
+
+async function pickDirectory() {
+  const dir = await window.go.main.App.PickDirectory();
+  if (dir) await scan(dir);
+}
+
+async function scan(dir) {
+  els.dirError.classList.add('hidden');
+  try {
+    const stats = await window.go.main.App.ScanDirectory(dir);
+    state.dir = dir;
+    els.dirPath.textContent = dir;
+    els.dirPath.classList.remove('empty');
+    els.dirPath.title = dir;
+    els.statJpg.textContent = stats.jpg;
+    els.statRaw.textContent = stats.raw;
+    els.statVideo.textContent = stats.video;
+    els.statSize.textContent = fmtSize(stats.totalSize);
+    els.dirStats.classList.remove('hidden');
+    els.btnRun.disabled = false;
+    els.statusbar.textContent = '目录已就绪，点击「开始处理」执行';
+  } catch (err) {
+    state.dir = '';
+    els.btnRun.disabled = true;
+    els.dirStats.classList.add('hidden');
+    els.dirError.textContent = String(err);
+    els.dirError.classList.remove('hidden');
+  }
+}
+
+// ---------- 运行控制 ----------
+
+function setRunningUI(running) {
+  state.running = running;
+  els.btnRun.classList.toggle('hidden', running);
+  els.btnCancel.classList.toggle('hidden', !running);
+  els.btnBrowse.disabled = running;
+  for (const card of els.steps.children) card.classList.toggle('disabled', running);
+}
+
+async function run() {
+  if (!state.dir || state.running) return;
+  const steps = STEPS.map((s) => s.checked);
+  if (!steps.some(Boolean)) {
+    els.statusbar.textContent = '请至少勾选一个步骤';
     return;
   }
-  
-  isProcessing = true;
-  document.getElementById('output').textContent = '';
-  startTimer();
-  
-  const statusEl = document.getElementById('status-text');
-  statusEl.className = 'status processing';
-  statusEl.textContent = '处理中...';
-  
-  const btnStart = document.getElementById('btn-start');
-  btnStart.disabled = true;
-  btnStart.style.opacity = '0.6';
-  
+
+  setRunningUI(true);
+  setPill('running');
+  resetStepStates();
+  resetProgress();
+  els.statusbar.textContent = '任务启动中…';
+  state.startAt = Date.now();
+  els.elapsed.textContent = '0s';
+  state.timerId = setInterval(() => {
+    els.elapsed.textContent = fmtElapsed(Date.now() - state.startAt);
+  }, 500);
+
   try {
-    if (window.go && window.go.main && window.go.main.App) {
-      await window.go.main.App.StartProcessing(dir, steps);
-    }
+    await window.go.main.App.StartProcessing(state.dir, steps);
   } catch (err) {
-    appendOutput(`错误: ${err}\n`);
-    resetProcessingState();
+    appendLog(`\n✗ 启动失败：${err}\n`);
+    finishUI(true, String(err));
   }
 }
 
-function resetProcessingState() {
-  isProcessing = false;
-  const btnStart = document.getElementById('btn-start');
-  btnStart.disabled = false;
-  btnStart.style.opacity = '1';
-  stopTimer();
-}
-
-function appendOutput(text) {
-  const output = document.getElementById('output');
-  output.textContent += text;
-  output.scrollTop = output.scrollHeight;
-}
-
-function startTimer() {
-  startTime = Date.now();
-  const timerEl = document.getElementById('timer');
-  if (timerInterval) clearInterval(timerInterval);
-  
-  timerInterval = setInterval(() => {
-    const elapsed = Date.now() - startTime;
-    const minutes = Math.floor(elapsed / 60000);
-    const seconds = Math.floor((elapsed % 60000) / 1000);
-    timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  }, 1000);
-}
-
-function stopTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
+function finishUI(cancelled, detail) {
+  clearInterval(state.timerId);
+  state.timerId = null;
+  setRunningUI(false);
+  setPill(cancelled ? 'error' : 'done');
+  for (let i = 0; i < STEPS.length; i++) {
+    const card = els.steps.children[i];
+    if (card && card.classList.contains('running')) setStepState(i, 'finished');
   }
+  els.fill.classList.remove('indeterminate');
+  if (!cancelled) els.fill.style.width = '100%';
+  els.statusbar.textContent = cancelled
+    ? '任务已取消'
+    : `全部完成，用时 ${detail || fmtElapsed(Date.now() - state.startAt)}`;
 }
 
-function showConfirmDialog(message) {
-  document.getElementById('confirm-message').textContent = message;
-  document.getElementById('confirm-dialog').classList.remove('hidden');
+// ---------- 确认弹窗 ----------
+
+function showConfirm(message) {
+  els.modalMsg.textContent = message;
+  els.modalMask.classList.remove('hidden');
 }
 
-function hideConfirmDialog() {
-  document.getElementById('confirm-dialog').classList.add('hidden');
+function answerConfirm(ok) {
+  els.modalMask.classList.add('hidden');
+  window.go.main.App.ConfirmStep4(ok);
 }
 
-async function handleConfirm(confirmed) {
-  hideConfirmDialog();
+// ---------- 主题 ----------
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  html.dataset.theme = next;
+  try { localStorage.setItem('after-photo-theme', next); } catch (_) {}
+}
+
+function loadTheme() {
   try {
-    if (window.go && window.go.main && window.go.main.App) {
-      const err = await window.go.main.App.ConfirmStep4(confirmed);
-      if (err) appendOutput(`确认失败: ${err}\n`);
-    }
-  } catch (err) {
-    appendOutput(`确认错误: ${err}\n`);
-  }
+    const t = localStorage.getItem('after-photo-theme');
+    if (t) document.documentElement.dataset.theme = t;
+  } catch (_) {}
 }
 
-function handleProcessingComplete(duration) {
-  resetProcessingState();
-  const statusEl = document.getElementById('status-text');
-  statusEl.className = 'status success';
-  statusEl.textContent = `完成 ${duration}`;
+// ---------- 事件订阅 ----------
+
+function subscribe() {
+  window.runtime.EventsOn('log', (text) => appendLog(text));
+  window.runtime.EventsOn('progress', (p) => setProgress(p.current, p.total, p.message));
+  window.runtime.EventsOn('step', (s) => {
+    for (let i = 0; i < STEPS.length; i++) {
+      const card = els.steps.children[i];
+      if (card && card.classList.contains('running')) setStepState(i, 'finished');
+    }
+    setStepState(s.index, 'running');
+    resetProgress();
+    els.statusbar.textContent = s.name;
+  });
+  window.runtime.EventsOn('confirm', (msg) => showConfirm(msg));
+  window.runtime.EventsOn('done', (d) => finishUI(d.cancelled, d.duration));
 }
+
+// ---------- 初始化 ----------
+
+function init() {
+  loadTheme();
+  buildSteps();
+  subscribe();
+
+  els.btnBrowse.addEventListener('click', pickDirectory);
+  els.btnRun.addEventListener('click', run);
+  els.btnCancel.addEventListener('click', () => {
+    els.btnCancel.disabled = true;
+    els.statusbar.textContent = '正在取消，等待当前步骤结束…';
+    window.go.main.App.CancelProcessing();
+    setTimeout(() => { els.btnCancel.disabled = false; }, 1500);
+  });
+  els.btnClear.addEventListener('click', () => { els.console.innerHTML = ''; });
+  els.btnScroll.addEventListener('click', () => {
+    state.autoScroll = !state.autoScroll;
+    els.btnScroll.classList.toggle('active', state.autoScroll);
+    if (state.autoScroll) els.console.scrollTop = els.console.scrollHeight;
+  });
+  els.btnTheme.addEventListener('click', toggleTheme);
+  els.btnModalYes.addEventListener('click', () => answerConfirm(true));
+  els.btnModalNo.addEventListener('click', () => answerConfirm(false));
+}
+
+window.addEventListener('DOMContentLoaded', init);

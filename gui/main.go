@@ -15,11 +15,12 @@ func main() {
 	app := NewApp()
 
 	err := wails.Run(&options.App{
-		Title:     "After Photo - 照片整理工具",
-		Width:     1280,
-		Height:    860,
-		MinWidth:  1024,
-		MinHeight: 700,
+		Title:            "After Photo",
+		Width:            1180,
+		Height:           800,
+		MinWidth:         960,
+		MinHeight:        640,
+		BackgroundColour: &options.RGBA{R: 15, G: 17, B: 23, A: 255},
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

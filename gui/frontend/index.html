@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,180 +8,117 @@
 </head>
 <body>
   <div id="app">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-left">
-        <h1 class="logo">After Photo</h1>
-      </div>
-      <div class="header-right">
-        <button id="help-toggle" class="btn-icon" title="关于">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-        </button>
-        <button id="theme-toggle" class="btn-icon" title="切换主题">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/>
-            <line x1="12" y1="1" x2="12" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="23"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-            <line x1="1" y1="12" x2="3" y2="12"/>
-            <line x1="21" y1="12" x2="23" y2="12"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-          </svg>
-        </button>
-      </div>
-    </header>
 
-    <!-- Help Dialog -->
-    <div id="help-dialog" class="dialog hidden">
-      <div class="dialog-content help-content">
-        <div class="help-header">
-          <h2>After Photo</h2>
-          <button id="help-close" class="btn-icon">&times;</button>
-        </div>
-        <div class="help-body">
-          <p class="help-tagline">连拍摄影师的效率工具</p>
-          <p class="help-desc">自动去重、智能选优，让整理照片不再拖垮创作节奏。</p>
-          
-          <h4>核心功能</h4>
-          <ul class="help-list">
-            <li><strong>按类型拆分</strong> — JPG、RAW、视频自动归类</li>
-            <li><strong>重复检测</strong> — pHash 感知哈希 + 30 秒时间阈值</li>
-            <li><strong>智能选优</strong> — 基于清晰度和亮度自动评分</li>
-            <li><strong>RAW 清理</strong> — 一键清理无对应 JPG 的 RAW 文件</li>
-          </ul>
-          
-          <h4>使用方法</h4>
-          <ol class="help-list">
-            <li>选择照片目录</li>
-            <li>勾选需要执行的步骤</li>
-            <li>点击「开始处理」</li>
-          </ol>
-          
-          <h4>支持格式</h4>
-          <p class="help-formats">JPG · JPEG · CR2 · CR3 · NEF · ARW · DNG · ORF · RW2 · PEF · MP4 · MOV</p>
+    <!-- 左侧：配置面板 -->
+    <aside class="sidebar">
+      <div class="brand">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="14.31" y1="8" x2="20.05" y2="17.94"/>
+          <line x1="9.69" y1="8" x2="21.17" y2="8"/>
+          <line x1="7.38" y1="12" x2="13.12" y2="2.06"/>
+          <line x1="9.69" y1="16" x2="3.95" y2="6.06"/>
+          <line x1="14.31" y1="16" x2="2.83" y2="16"/>
+          <line x1="16.62" y1="12" x2="10.88" y2="21.94"/>
+        </svg>
+        <div class="brand-text">
+          <h1>After Photo</h1>
+          <p>连拍照片整理工作台</p>
         </div>
       </div>
-    </div>
 
-    <!-- Theme Panel -->
-    <div id="theme-panel" class="theme-panel hidden">
-      <div class="theme-panel-header">
-        <h2>选择主题</h2>
-        <div class="theme-filter">
-          <button class="filter-btn active" data-filter="all">全部</button>
-          <button class="filter-btn" data-filter="dark">深色</button>
-          <button class="filter-btn" data-filter="light">浅色</button>
-        </div>
-        <button id="theme-close" class="btn-icon">&times;</button>
-      </div>
-      <div id="theme-grid" class="theme-grid"></div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="main">
-      <!-- Left Panel -->
-      <aside class="sidebar">
-        <!-- Directory Selection -->
-        <section class="sidebar-section">
-          <h3 class="sidebar-title">照片目录</h3>
-          <div class="dir-input-group">
-            <input type="text" id="dir-input" placeholder="输入路径或点击浏览..." class="input">
-            <button id="btn-browse" class="btn-icon" title="浏览">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-              </svg>
-            </button>
-          </div>
-          <div id="dir-error" class="error hidden"></div>
-          <div id="dir-status" class="dir-status hidden">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
+      <!-- 目录选择 -->
+      <section class="panel">
+        <div class="panel-label">工作目录</div>
+        <div class="dir-row">
+          <div id="dir-path" class="dir-path empty">未选择目录</div>
+          <button id="btn-browse" class="btn btn-ghost" title="选择目录">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
             </svg>
-            <span id="dir-path"></span>
-          </div>
-        </section>
-
-        <!-- Steps Selection -->
-        <section class="sidebar-section">
-          <h3 class="sidebar-title">处理步骤</h3>
-          <div class="steps-list">
-            <label class="step-item">
-              <input type="checkbox" id="step1" checked>
-              <div class="step-content">
-                <span class="step-name">按类型拆分</span>
-                <span class="step-desc">JPG / RAW / 视频</span>
-              </div>
-            </label>
-            <label class="step-item">
-              <input type="checkbox" id="step2" checked>
-              <div class="step-content">
-                <span class="step-name">重复检测</span>
-                <span class="step-desc">pHash 感知哈希</span>
-              </div>
-            </label>
-            <label class="step-item">
-              <input type="checkbox" id="step3" checked>
-              <div class="step-content">
-                <span class="step-name">智能选优</span>
-                <span class="step-desc">清晰度 + 亮度评分</span>
-              </div>
-            </label>
-            <label class="step-item danger">
-              <input type="checkbox" id="step4">
-              <div class="step-content">
-                <span class="step-name">RAW 清理</span>
-                <span class="step-desc">删除无对应 JPG 的 RAW</span>
-              </div>
-            </label>
-          </div>
-        </section>
-
-        <!-- Action Button -->
-        <section class="sidebar-section sidebar-actions">
-          <button id="btn-start" class="btn btn-primary btn-block">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"/>
-            </svg>
-            开始处理
+            浏览
           </button>
-          <div class="action-status">
-            <span id="status-text" class="status idle">就绪</span>
-            <span id="timer" class="timer"></span>
-          </div>
-        </section>
-      </aside>
+        </div>
+        <div id="dir-error" class="dir-error hidden"></div>
+        <div id="dir-stats" class="stats hidden">
+          <div class="stat"><span class="stat-num" id="stat-jpg">0</span><span class="stat-label">JPG</span></div>
+          <div class="stat"><span class="stat-num" id="stat-raw">0</span><span class="stat-label">RAW</span></div>
+          <div class="stat"><span class="stat-num" id="stat-video">0</span><span class="stat-label">视频</span></div>
+          <div class="stat"><span class="stat-num" id="stat-size">0</span><span class="stat-label">大小</span></div>
+        </div>
+      </section>
 
-      <!-- Right Panel - Output -->
-      <section class="content">
-        <div class="content-header">
-          <h3>执行日志</h3>
-          <button id="btn-clear" class="btn-icon" title="清空日志">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <!-- 步骤选择 -->
+      <section class="panel panel-grow">
+        <div class="panel-label">处理流程</div>
+        <div id="steps" class="steps"></div>
+      </section>
+
+      <!-- 操作 -->
+      <div class="actions">
+        <button id="btn-run" class="btn btn-primary" disabled>
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          开始处理
+        </button>
+        <button id="btn-cancel" class="btn btn-danger hidden">取消任务</button>
+      </div>
+    </aside>
+
+    <!-- 右侧：执行视图 -->
+    <main class="main">
+      <header class="toolbar">
+        <span id="status-pill" class="pill pill-idle">就绪</span>
+        <div class="progress">
+          <div class="progress-track">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <span id="progress-text" class="progress-text"></span>
+        </div>
+        <span id="elapsed" class="elapsed"></span>
+        <div class="toolbar-actions">
+          <button id="btn-scroll" class="icon-btn active" title="自动滚动">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/>
+            </svg>
+          </button>
+          <button id="btn-clear" class="icon-btn" title="清空日志">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3 6 5 6 21 6"/>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
             </svg>
           </button>
+          <button id="btn-theme" class="icon-btn" title="切换主题">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="6.36"/>
+            </svg>
+          </button>
         </div>
-        <div id="output" class="output"></div>
-      </section>
-    </main>
+      </header>
 
-    <!-- Confirm Dialog -->
-    <div id="confirm-dialog" class="dialog hidden">
-      <div class="dialog-content">
-        <h3>确认操作</h3>
-        <p id="confirm-message"></p>
-        <div class="dialog-actions">
-          <button id="btn-confirm-no" class="btn btn-secondary">取消</button>
-          <button id="btn-confirm-yes" class="btn btn-danger">确认删除</button>
-        </div>
+      <div id="console" class="console"></div>
+
+      <footer id="statusbar" class="statusbar">选择照片目录，勾选需要的步骤，然后开始处理</footer>
+    </main>
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div id="modal-mask" class="modal-mask hidden">
+    <div class="modal">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h2>确认删除</h2>
+      <p id="modal-msg" class="modal-msg"></p>
+      <div class="modal-actions">
+        <button id="btn-modal-no" class="btn btn-ghost">取消</button>
+        <button id="btn-modal-yes" class="btn btn-danger">确认删除</button>
       </div>
     </div>
   </div>
